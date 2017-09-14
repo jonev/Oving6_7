@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Credit - Wiredwiki -->
+    <meta charset="utf-8">
+    <title>Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Quiz masters page">
+    <meta name="author" content="Jova">
+
+    <title>Quiz</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+
+</head>
+<style>
+    body{
+        padding-top: 100px;
+    }
+</style>
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-inverse navbar-fixed-top" id="my-navbar">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            <a id="navoverview" data-page="home" class="navbar-brand" >Overview</a>
+        </div><!-- Navbar Header-->
+        <div class="collapse navbar-collapse" id="navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li><a class="navbuttons" id="navcreatequiz">Create a quiz</a>
+                <li><a class="navbuttons" id="navquizscoreboard">Scoreboard</a>
+                <li><a class="navbuttons" id="navcreateusername">Change nick</a>
+            </ul>
+        </div>
+    </div><!-- End Container-->
+</nav><!-- End navbar -->
+
+    <div id="maincontent">
+        <div id="divoverview" hidden>
+            <h1>This is the OVERVIEW quiz!!</h1>
+        </div>
+        <div id="divcreateusename">
+            <div class="row">
+                <div class="col-lg-8">
+                    <form class="form-horizontal" id="formcreateusername">
+                        <div class="form-group">
+                            <label for="username" class="col-lg-2 control-label">Nickname</label>
+                            <div class="col-lg-10">
+                                <input type="text" class="form-control" id="username" placeholder="Enter nickname">
+                            </div>
+                        </div><!-- End form group -->
+                        <div class="form-group">
+                            <div class="col-lg-10 col-lg-offset-2">
+                                <button id="btncreateusername" type="button" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div><!-- End the row -->
+
+        </div>
+
+        <div id="divcreatequiz" hidden>
+            <h1>This is the create quiz!!</h1>
+        </div>
+        <div id="divscoreboard" hidden>
+            <h1>This is the scoreboard!!</h1>
+        </div>
+
+    </div><!-- End of main content -->
+
+    <!-- Bootstrap core JavaScript -->
+
+    <script src="lib/jquery/jquery.min.js"></script>
+    <script src="lib/popper/popper.min.js"></script>
+    <script src="lib/bootstrap/js/bootstrap.min.js"></script>
+    <script src="index.js"></script>
+
+</body>
+</html>
+
