@@ -12,9 +12,12 @@
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.css">
 
     <!-- Optional theme -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+
+
 
 </head>
 <style>
@@ -40,7 +43,7 @@
             <ul class="nav navbar-nav">
                 <li><a class="navbuttons" id="navcreatequiz">Create a quiz</a>
                 <li><a class="navbuttons" id="navquizscoreboard">Scoreboard</a>
-                <li><a class="navbuttons" id="navcreateusername">Change nick</a>
+                <!-- <li><a class="navbuttons" id="navcreateusername">Change nick</a> -->
             </ul>
         </div>
     </div><!-- End Container-->
@@ -50,7 +53,7 @@
         <div id="divoverview" hidden>
             <h1>This is the OVERVIEW quiz!!</h1>
         </div>
-        <div id="divcreateusename">
+        <div id="divcreateusename" hidden>
             <div class="row">
                 <div class="col-lg-8">
                     <form class="form-horizontal" id="formcreateusername">
@@ -73,9 +76,61 @@
 
         <div id="divcreatequiz" hidden>
             <h1>This is the create quiz!!</h1>
+            <section>
+                <div class="row">
+                    <div class="col-lg-8">
+                        <form action="" class="form-horizontal" id="formcreatequiz">
+                            <div class="form-group">
+                                <div class="col-lg-10 col-lg-offset-2">
+                                    <button id="btncreatequiz" type="button" class="btn btn-primary">Submit</button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="quizname" class="col-lg-2 control-label">Name</label>
+                                <div class="col-lg-10">
+                                    <input type="text" class="form-control" id="quizname" placeholder="Enter quiz name">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label  class="col-lg-2 control-label">Start</label>
+                                <div class="input-group date" id="divquizstart">
+                                    <input id="quizstart" type="text" class="form-control">
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="quizdescription" class="col-lg-2 control-label">Description</label>
+                                <div class="col-lg-10">
+                                    <textarea name="quiz-description" id="quizdescription" class="form-control"
+                                              cols="20" rows="10" placeholder="Enter quiz description"></textarea>
+                                </div>
+                            </div><!-- End form group -->
+                            <div class="form-group" id="divquestions">
+
+                            </div>
+                            <div class="form-group">
+                                <div class="col-lg-10 col-lg-offset-2">
+                                    <button id="btnaddquestion" type="button" class="btn btn-primary">Add question</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div><!-- End the row -->
+
+            </section>
         </div>
         <div id="divscoreboard" hidden>
             <h1>This is the scoreboard!!</h1>
+            <table data-toggle="table" id="tablescoreboard" class="display table table-bordered">
+                <thead>
+                    <tr>
+                        <th data-field="username">Nick</th><th data-field="score">Score</th>
+                    </tr>
+                </thead>
+            </table>
         </div>
 
     </div><!-- End of main content -->
@@ -85,6 +140,9 @@
     <script src="lib/jquery/jquery.min.js"></script>
     <script src="lib/popper/popper.min.js"></script>
     <script src="lib/bootstrap/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.js"></script>
+    <script src="lib/bootstrap/js/bootstrap-datetimepicker.js"></script>
     <script src="index.js"></script>
 
 </body>
