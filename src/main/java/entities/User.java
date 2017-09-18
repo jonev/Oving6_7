@@ -1,5 +1,7 @@
 package entities;
-
+/**
+ * @author jonev
+ */
 public class User {
     private String username;
     private int score;
@@ -24,3 +26,4 @@ public class User {
     }
 
 }
+

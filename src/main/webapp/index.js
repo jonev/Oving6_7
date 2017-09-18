@@ -1,5 +1,5 @@
 /**
- * Created by JoneSkole on 13.09.2017.
+ * @author jonev on 13.09.2017.
  */
 var numberofquestions;
 var numberofansweres;
@@ -12,7 +12,9 @@ $(document).ready(function () {
     }
 
     $(function () {
-        $('#divquizstart').datetimepicker();
+        $('#divquizstart').datetimepicker({
+            format:"YYYY-MM-DD HH:mm"
+        });
     });
 
     function fetchScoreboard() {
@@ -22,9 +24,27 @@ $(document).ready(function () {
             datatype: 'json',
             success: function (data) {
                 $('#tablescoreboard').bootstrapTable('load', data);
+            },
+            error: function (result) {
+                console.info(result.responseText);
             }
         });
     }
+
+    function fetchQuizes() {
+        $.ajax({
+            url: 'rest/Quiz/getquizes',
+            type: 'GET',
+            datatype: 'json',
+            success: function (data) {
+                $('#tablequizes').bootstrapTable('load', data);
+            },
+            error: function (result) {
+                console.info(result.responseText);
+            }
+        });
+    }
+
 
     $("#btncreateusername").on('click', function () {
         var u = $("#username").val();
@@ -46,7 +66,7 @@ $(document).ready(function () {
                 }
             },
             error: function (result) {
-                console.info("Error: " + result);
+                console.info(result.responseText);
             }
         });
     });
@@ -58,52 +78,77 @@ $(document).ready(function () {
         if(name == undefined || name == null || name.length < 2|| desc == undefined || desc == null || desc.length < 2) {
             return;
         }
-        var question;
-        var answers = [];
+        var jsonQuestion = {
+            name: name,
+            description: desc,
+            startdate: "" + moment($('#quizstart').val(), "YYYY-MM-SS HH-mm").valueOf(),
+            questions: []
+        };
+
+        jsonQuestion.questions[0] = "{\"question\":\"the question\"}";
+        jsonQuestion.questions[1] = "{\"question\":\"the question2\"}";
+        var question = [];
+        var answers = new Array();
+        /*
         $.each($("#divquestions"), function (i, l) {
             $('.col-lg-10', l).each(function (j, k) {
+                var currentQ;
                 var anscount = 0;
+                answers[j] = new Array();
                 $('.form-control', k).each(function (o, p) {
                     if(p.getAttribute('data-type') == "q"){
-                        question = $(p).val();
-                        console.info($(p).val());
+                        question[j] = $(p).val();
+                        currentQ = $(p).val();
+
+                        //jsonQuestion.questions = [];
+                         //jsonQuestion.questions.push('question:' + $(p).val());
+                        //jsonQuestion[j]["answereAlternatives"] = [];
+                        jsonQuestion.questions[j] = [];
+                        jsonQuestion.questions[j][o] = "{question:" + $(p).val() + "}";
+                        //jsonQuestion.questions[j].push("question:" + $(p).val());
+                        //console.info($(p).val());
+                        //console.info($(p).val());
                     }
                     if(p.getAttribute('data-type') == "a"){
-                        answers.push($(p).val());
-                        console.info($(p).val());
+                        //answers[j][anscount] = $(p).val();
+                        //jsonQuestion[j]["answereAlternatives"][anscount] = $(p).val();
+                        //console.info($(p).val());
                         anscount++;
                     }
 
                 })
             })
         });
-        // $.each($("#divquestions.col-lg-10.form-control"), function (i, l) {
-        //     console.info("h2");
-        // });
-        return;
+        */
+        console.info(jsonQuestion);
+        console.info(JSON.stringify(jsonQuestion));
         $.ajax({
             url: 'rest/Quiz/createquiz',
             type: 'POST',
-            data: JSON.stringify({
-                name: name,
-                description: desc,
-                startDate: $("#quizstart").val()
-
-            }),
+            data: JSON.stringify(jsonQuestion),
+            //    name: name,
+            //    description: desc,
+            //    startdate: "" + moment($('#quizstart').val(), "YYYY-MM-SS HH-mm").valueOf(),
+            //),
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function(result) {
-                console.info("Success: " + result);
+                console.info("Success: " + result.responseText);
             },
             error: function (result) {
-                console.info("Error: " + result);
+                console.info("Error: " + result.responseText);
             }
         });
     });
 
     $("#btnaddquestion").on('click', function () {
 
-        $("<label for='question" + numberofquestions + "' class='col-lg-2 control-label'>Question" + numberofquestions + "</label><div id='divquestion" + numberofquestions + "' class='col-lg-10'><input type='text' class='form-control' data-type='q' placeholder='Enter question'><input type='text' class='form-control' data-type='a' placeholder='Enter answer'><input type='text' data-type='a' class='form-control' placeholder='Enter answer'>").appendTo("#divquestions");
+        $("<label for='question" + numberofquestions + "' class='col-lg-2 control-label'>Question" + numberofquestions + "</label>" +
+            "<div id='divquestion" + numberofquestions + "' class='col-lg-10'>" +
+            "<input type='text' class='form-control' data-type='q' placeholder='Enter question'>" +
+            "<input type='text' class='form-control' data-type='a' placeholder='Enter answer'>" +
+            "<input type='text' data-type='a' class='form-control' placeholder='Enter answer'>")
+            .appendTo("#divquestions");
         //<button id='btnaddanswer" + numberofquestions + "'  type='button' class='btn btn-primary'>Add answer</button></div>").appendTo("#divquestions");
         // $("#btnaddanswer" + numberofquestions).on('click'), function () {
         //     $("<input type='text' class='form-control' id='answer" + numberofquestions + "' placeholder='Enter answer'>").appendTo("#question" + numberofquestions);
@@ -136,34 +181,52 @@ $(document).ready(function () {
         numberofquestions++;
     });
 
+    var intervallupdatescoreboard;
+    var intervallupdatequizes;
+
     $("#navoverview").on("click", function(){
         if(!usernamealocated()) return;
         $("#divcreateusename").hide();
-        $("#divoverview").show();
-        $("#divscoreboard").hide();
+        $("#divoverview").show(function () {
+            intervallupdatequizes = setInterval(fetchQuizes, 5000);
+        });
+        $("#divscoreboard").hide(function () {
+            window.clearInterval(intervallupdatescoreboard);
+        });
         $("#divcreatequiz").hide();
     });
     $("#navquizscoreboard").on("click", function(){
         if(!usernamealocated()) return;
         $("#divcreateusename").hide();
-        $("#divoverview").hide();
+        $("#divoverview").hide(function () {
+            window.clearInterval(fetchQuizes);
+        });
         $("#divscoreboard").show(function () {
-            fetchScoreboard();
+            intervallupdatescoreboard = setInterval(fetchScoreboard, 5000);
+
         });
         $("#divcreatequiz").hide();
     });
     $("#navcreatequiz").on("click", function(){
         if(!usernamealocated()) return;
         $("#divcreateusename").hide();
-        $("#divoverview").hide();
-        $("#divscoreboard").hide();
+        $("#divoverview").hide(function () {
+            window.clearInterval(fetchQuizes);
+        });
+        $("#divscoreboard").hide(function () {
+            window.clearInterval(intervallupdatescoreboard);
+        });
         $("#divcreatequiz").show();
     });
 
     $("#navcreateusername").on("click", function(){
         $("#divcreateusename").show();
-        $("#divoverview").hide();
-        $("#divscoreboard").hide();
+        $("#divoverview").hide(function () {
+            window.clearInterval(fetchQuizes);
+        });
+        $("#divscoreboard").hide(function () {
+            window.clearInterval(intervallupdatescoreboard);
+        });
         $("#divcreatequiz").hide();
     });
 

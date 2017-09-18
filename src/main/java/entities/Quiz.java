@@ -1,6 +1,8 @@
 package entities;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author jonev
@@ -8,32 +10,51 @@ import java.util.Date;
 public class Quiz {
     private String name;
     private String description;
-    private Date starDate;
+    private String startdate;
+    private List<Question> questions;
 
     public Quiz() {
+        questions = new ArrayList<Question>();
     }
 
     public String getName() {
         return name;
     }
 
-    public Date getStarDate() {
-        return starDate;
+    public String getStartdate() {
+        return startdate;
     }
 
     public String getDescription() {
         return description;
     }
 
+    public List<Question> getQuestions() {
+        return questions;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setStarDate(Date starDate) {
-        this.starDate = starDate;
+    public void setStartdate(String startdate) {
+        this.startdate = startdate;
     }
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public void setQuestions(List<Question> questions) {
+        this.questions = questions;
+    }
+
+    public String toString(){
+        String s = name + ", " + description + ", " + startdate;
+        if(questions == null) return s;
+        for (Question q : questions) {
+            s += q.toString();
+        }
+        return s;
     }
 }
