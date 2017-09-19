@@ -1,15 +1,13 @@
 package services;
 
+import entities.Question;
 import entities.Quiz;
 import entities.User;
 import entities.UsersByScore;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * Credit nilstes
@@ -24,6 +22,16 @@ public class QuizMaster {
     public QuizMaster(){
         Quiz q = new Quiz();
         q.setName("Quiz1");
+        q.setDescription("Desc quiz 1");
+        q.setStartdate("1513080000");
+        List<Question> lstq = new ArrayList<Question>();
+        Question question = new Question();
+        question.setQuestion("This is the question1");
+        lstq.add(question);
+        question = new Question();
+        question.setQuestion("This is the question2");
+        lstq.add(question);
+        q.setQuestions(lstq);
         activeQuizes.put(q.getName(), q);
         // User u = new User();
         // u.setScore(1);
@@ -43,7 +51,7 @@ public class QuizMaster {
     @Path("{username}")
     @Produces(MediaType.TEXT_PLAIN)
     public String createUsername(@PathParam("username") String username){
-        if (!activeUsers.contains(username)) {
+        if (!activeUsers.contains(username)) { // todo fiks denne. username er ikke en User
             User newUser = new User();
             newUser.setUsername(username);
             newUser.setScore(0);
@@ -74,7 +82,7 @@ public class QuizMaster {
     public boolean addQuestions(Quiz newQuiz){
         System.out.println(newQuiz.toString());
         if (!activeQuizes.containsKey(newQuiz.getName())) {
-            this.newQuiz = newQuiz;
+            activeQuizes.put(newQuiz.getName(), newQuiz);
             return true;
         } else {
             return false;
@@ -99,8 +107,8 @@ public class QuizMaster {
     @GET
     @Path("getquizes")
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<Quiz> getQuizes() {
-        return activeQuizes.values();
+    public Collection<String> getQuizes() {
+        return activeQuizes.keySet();
     }
 
 }

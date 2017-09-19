@@ -31,13 +31,41 @@ $(document).ready(function () {
         });
     }
 
+    $('#tablequizes')
+        .on('dbl-click-row.bs.table', function (e, row, $element) {
+            console.log(e);
+            console.log(row);
+            console.log($element)
+            fetchQuiz(row);
+        });
+
+    function joinQuizButtonFormater() {
+        return '<button>Join</button>';
+    }
+
     function fetchQuizes() {
         $.ajax({
             url: 'rest/Quiz/getquizes',
             type: 'GET',
             datatype: 'json',
             success: function (data) {
+                console.info(data);
                 $('#tablequizes').bootstrapTable('load', data);
+            },
+            error: function (result) {
+                console.info(result.responseText);
+            }
+        });
+    }
+
+    function fetchQuiz(quizname) {
+        $.ajax({
+            url: 'rest/Quiz/getquiz/' + quizname,
+            type: 'GET',
+            datatype: 'json',
+            success: function (data, result) {
+                console.info(result.responseText);
+                console.info(data);
             },
             error: function (result) {
                 console.info(result.responseText);
@@ -85,11 +113,12 @@ $(document).ready(function () {
             questions: []
         };
 
-        jsonQuestion.questions[0] = "{\"question\":\"the question\"}";
-        jsonQuestion.questions[1] = "{\"question\":\"the question2\"}";
+        // jsonQuestion.questions[0] = {"question": "the question1"};
+        // jsonQuestion.questions[1] = {"question": "the question2"};
+        // jsonQuestion.questions[1] = "{question:\"the question2\"}";
         var question = [];
         var answers = new Array();
-        /*
+
         $.each($("#divquestions"), function (i, l) {
             $('.col-lg-10', l).each(function (j, k) {
                 var currentQ;
@@ -103,15 +132,16 @@ $(document).ready(function () {
                         //jsonQuestion.questions = [];
                          //jsonQuestion.questions.push('question:' + $(p).val());
                         //jsonQuestion[j]["answereAlternatives"] = [];
-                        jsonQuestion.questions[j] = [];
-                        jsonQuestion.questions[j][o] = "{question:" + $(p).val() + "}";
+                        jsonQuestion.questions[j] = {"question": $(p).val()};
+                        jsonQuestion.questions[j]['answereAlternatives'] = [];
+                        // jsonQuestion.questions[j] = "{question:" + $(p).val() + "}";
                         //jsonQuestion.questions[j].push("question:" + $(p).val());
                         //console.info($(p).val());
                         //console.info($(p).val());
                     }
                     if(p.getAttribute('data-type') == "a"){
                         //answers[j][anscount] = $(p).val();
-                        //jsonQuestion[j]["answereAlternatives"][anscount] = $(p).val();
+                        jsonQuestion.questions[j]['answereAlternatives'][anscount] = $(p).val();
                         //console.info($(p).val());
                         anscount++;
                     }
@@ -119,7 +149,7 @@ $(document).ready(function () {
                 })
             })
         });
-        */
+
         console.info(jsonQuestion);
         console.info(JSON.stringify(jsonQuestion));
         $.ajax({
@@ -142,18 +172,13 @@ $(document).ready(function () {
     });
 
     $("#btnaddquestion").on('click', function () {
-
         $("<label for='question" + numberofquestions + "' class='col-lg-2 control-label'>Question" + numberofquestions + "</label>" +
             "<div id='divquestion" + numberofquestions + "' class='col-lg-10'>" +
             "<input type='text' class='form-control' data-type='q' placeholder='Enter question'>" +
             "<input type='text' class='form-control' data-type='a' placeholder='Enter answer'>" +
             "<input type='text' data-type='a' class='form-control' placeholder='Enter answer'>")
             .appendTo("#divquestions");
-        //<button id='btnaddanswer" + numberofquestions + "'  type='button' class='btn btn-primary'>Add answer</button></div>").appendTo("#divquestions");
-        // $("#btnaddanswer" + numberofquestions).on('click'), function () {
-        //     $("<input type='text' class='form-control' id='answer" + numberofquestions + "' placeholder='Enter answer'>").appendTo("#question" + numberofquestions);
-        // };
-        var test = $('<button/>',
+        var btnAddAnswer = $('<button/>',
             {
                 type: 'button',
                 text: 'Add answer',
@@ -164,20 +189,7 @@ $(document).ready(function () {
                     $(extraanswer).insertBefore(this);
                 }
             });
-        $(test).appendTo("#divquestion" + numberofquestions + "");
-
-
-        //$("#btnaddanswer" + numberofquestions + "").on('click', function ()
-        //{
-        //    var test = $('<button/>',
-        //        {
-        //            id: "#btnaddanswer" + numberofquestions + "",
-        //            text: 'Add answer',
-        //            click: function () { alert('hi'); }
-        //        });
-        //    var parent = $('<tr><td></td></tr>').children().append(test).end();
-        //    $("question" + numberofquestions + " tr:last").before(parent);
-        //});
+        $(btnAddAnswer).appendTo("#divquestion" + numberofquestions + "");
         numberofquestions++;
     });
 
@@ -199,7 +211,7 @@ $(document).ready(function () {
         if(!usernamealocated()) return;
         $("#divcreateusename").hide();
         $("#divoverview").hide(function () {
-            window.clearInterval(fetchQuizes);
+            window.clearInterval(intervallupdatequizes);
         });
         $("#divscoreboard").show(function () {
             intervallupdatescoreboard = setInterval(fetchScoreboard, 5000);
@@ -211,7 +223,7 @@ $(document).ready(function () {
         if(!usernamealocated()) return;
         $("#divcreateusename").hide();
         $("#divoverview").hide(function () {
-            window.clearInterval(fetchQuizes);
+            window.clearInterval(intervallupdatequizes);
         });
         $("#divscoreboard").hide(function () {
             window.clearInterval(intervallupdatescoreboard);
@@ -222,7 +234,7 @@ $(document).ready(function () {
     $("#navcreateusername").on("click", function(){
         $("#divcreateusename").show();
         $("#divoverview").hide(function () {
-            window.clearInterval(fetchQuizes);
+            window.clearInterval(intervallupdatequizes);
         });
         $("#divscoreboard").hide(function () {
             window.clearInterval(intervallupdatescoreboard);
