@@ -1,5 +1,6 @@
 package entities;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,12 +18,24 @@ public class Quiz {
         questions = new ArrayList<Question>();
     }
 
+    public Quiz(Quiz light) {
+        name = light.name;
+        description = light.description;
+        startdate = light.startdate;
+    }
+
     public String getName() {
         return name;
     }
 
     public String getStartdate() {
-        return startdate;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        Date d = new Date(Long.parseLong(startdate));
+        return sdf.format(d);
+    }
+
+    public Date getStartdateAsDate() {
+        return new Date(Long.parseLong(startdate));
     }
 
     public String getDescription() {

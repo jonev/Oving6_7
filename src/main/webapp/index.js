@@ -5,9 +5,17 @@ var numberofquestions;
 var numberofansweres;
 var activequiz;
 var answeringquiz = false;
+var anseringquestion = 0;
 
-function testalert(element) {
-    alert("test");
+function markAsCorectAnswere(element) {
+    // console.info(element);
+    if($(element).attr("data-cor") == "false"){
+        $(element).attr("data-cor", "true");
+        $(element).css('background-color', 'Aquamarine');
+    } else {
+        $(element).attr("data-cor", "false");
+        $(element).css('background-color', 'white');
+    }
 }
 
 
@@ -42,8 +50,7 @@ $(document).ready(function () {
         });
     }
 
-    $('#tablequizes')
-        .on('dbl-click-row.bs.table', function (e, row, $element) {
+    $('#tablequizes').on('dbl-click-row.bs.table', function (e, row, $element) {
             console.log(e);
             console.log(row);
             console.log($element);
@@ -58,7 +65,11 @@ $(document).ready(function () {
             datatype: 'json',
             success: function (data) {
                 // console.info(data);
-                $('#tablequizes').bootstrapTable('load', data);
+                if(data){
+                    $('#tablequizes').bootstrapTable('load', data);
+                }else {
+                    $('#tablequizes').empty();
+                }
             },
             error: function (result) {
                 console.info(result.responseText);
@@ -74,8 +85,11 @@ $(document).ready(function () {
             success: function (data, result) {
                 console.info(result.responseText);
                 console.info(data);
-                activequiz = data;
-                startQuiz();
+                var d = new Date();
+                if(Number(data.startdateAsDate) > d.getTime()) {
+                    activequiz = data;
+                    startQuiz();
+                }
 
             },
             error: function (result) {
@@ -84,6 +98,37 @@ $(document).ready(function () {
         });
     }
 
+    function fetchQuestion(qnr) {
+        $.ajax({
+            url: 'rest/Quiz/getnextquestion/' + activequiz.name + "/" + qnr,
+            type: 'GET',
+            datatype: 'json',
+            success: function (data, result) {
+                console.info(result.responseText);
+                console.info(data);
+            },
+            error: function (result) {
+                console.info(result.responseText);
+            }
+        });
+    }
+
+    function quizInterval1sek() {
+        if(activequiz){
+            // load question
+            // console.info(activequiz);
+            var d = new Date();
+            if(Number(activequiz.startdateAsDate) < d.getTime()){
+                $('#activequizstart').text("Ongoing");
+            }
+            if(anseringquestion == 0 && Number(activequiz.startdateAsDate)+(anseringquestion*5000) < d.getTime()){
+                fetchQuestion(anseringquestion);
+                anseringquestion++;
+            }
+        }
+    }
+
+    var intervalFetchUpdateActiveQuiz;
     function startQuiz() {
         $("#divcreateusename").hide();
         $("#divoverview").hide(function () {
@@ -94,13 +139,10 @@ $(document).ready(function () {
         });
         $("#divcreatequiz").hide();
         $("#divactivequiz").show(function () {
-            // $("<div class='form-group'> " +
-            //     "<label class='col-lg-2 control-label'>" + activequiz.name +
-            //     "</label>" +
-            //     "</div>")
-            //     .appendTo("#formactivequiz");
             answeringquiz = true;
             $("#activequizname").text(activequiz.name);
+            $("#activequizstart").text(activequiz.startdate);
+            intervalFetchUpdateActiveQuiz = setInterval(quizInterval1sek, 1000);
         });
     }
 
@@ -108,7 +150,9 @@ $(document).ready(function () {
     $("#btnexitquiz").on('click', function () {
         activequiz = null;
         answeringquiz = false;
-        $("#divactivequiz").hide();
+        $("#divactivequiz").hide(function () {
+            window.clearInterval(intervalFetchUpdateActiveQuiz);
+        });
         $("#divoverview").show(function () {
             intervallupdatequizes = setInterval(fetchQuizes, 5000);
         });
@@ -149,7 +193,7 @@ $(document).ready(function () {
         var jsonQuestion = {
             name: name,
             description: desc,
-            startdate: "" + moment($('#quizstart').val(), "YYYY-MM-SS HH-mm").valueOf(),
+            startdate: "" + moment($('#quizstart').val(), "YYYY-MM-DD HH:mm").valueOf(),
             questions: []
         };
         $.each($("#divquestions"), function (i, l) {
@@ -162,6 +206,9 @@ $(document).ready(function () {
                     }
                     if(p.getAttribute('data-type') == "a"){
                         jsonQuestion.questions[j]['answereAlternatives'][anscount] = $(p).val();
+                        if(p.getAttribute('data-cor') == "true"){
+                            jsonQuestion.questions[j]['correctAnswere'] = "" + anscount;
+                        }
                         anscount++;
                     }
                 })
@@ -193,15 +240,15 @@ $(document).ready(function () {
 
     $("#btnaddquestion").on('click', function () {
         $("<label for='question" + numberofquestions + "' class='col-lg-2 control-label'>Question" + numberofquestions + "</label>" +
-            "<div id='divquestion" + numberofquestions + "' class='col-lg-10'>" +
+            "<div id='divquestion" + numberofquestions + "' data-qnr='" + numberofquestions + "' data-corans='' class='col-lg-10'>" +
                 "<div class='row'>" +
-                    "<input type='text' class='form-control' ondblclick='testalert(this);' data-type='q' data-cor='false' placeholder='Enter question'>" +
+                    "<input type='text' class='form-control' data-type='q' data-cor='false' placeholder='Enter question'>" +
                 "</div>" +
                 "<div class='row'>" +
-                    "<input type='text' class='form-control' data-type='a' data-cor='false' placeholder='Enter answer'>" +
+                    "<input type='text' class='form-control' ondblclick='markAsCorectAnswere(this);' data-type='a' data-cor='false' placeholder='Enter answer'>" +
                 "</div>" +
                 "<div class='row'>" +
-                    "<input type='text' class='form-control' data-type='a' data-cor='false' class='form-control' placeholder='Enter answer'>" +
+                    "<input type='text' class='form-control' ondblclick='markAsCorectAnswere(this);' data-type='a' data-cor='false' class='form-control' placeholder='Enter answer'>" +
                 "</div>"
          + "</div>").appendTo("#divquestions");
         var btnAddAnswer = $('<button/>',
@@ -210,7 +257,7 @@ $(document).ready(function () {
                 text: 'Add answer',
                 click: function () {
                     //console.info("trykket");
-                    var extraanswer = "<div class='row'>" + "<input type='text' data-cor='false' class='form-control' data-type='a' placeholder='Enter answer'>" + "</div>";
+                    var extraanswer = "<div class='row'>" + "<input type='text' ondblclick='markAsCorectAnswere(this);' data-cor='false' class='form-control' data-type='a' placeholder='Enter answer'>" + "</div>";
                     $(extraanswer).insertBefore(this);
                 }
             });
