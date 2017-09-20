@@ -170,8 +170,14 @@ $(document).ready(function () {
             data: JSON.stringify(jsonQuestion),
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
-            success: function(result) {
-                console.info("Success: " + result.responseText);
+            success: function(data, result, jqXHR) {
+                console.info("Success: " + data + ", " + result.responseText);
+                if(data){
+                    $("#divquestions").empty();
+                    $("#quizname").val("");
+                    $("#quizdescription").val("");
+
+                }
             },
             error: function (result) {
                 console.info("Error: " + result.responseText);
@@ -182,16 +188,16 @@ $(document).ready(function () {
     $("#btnaddquestion").on('click', function () {
         $("<label for='question" + numberofquestions + "' class='col-lg-2 control-label'>Question" + numberofquestions + "</label>" +
             "<div id='divquestion" + numberofquestions + "' class='col-lg-10'>" +
-            "<input type='text' class='form-control' data-type='q' placeholder='Enter question'>" +
-            "<input type='text' class='form-control' data-type='a' placeholder='Enter answer'>" +
-            "<input type='text' data-type='a' class='form-control' placeholder='Enter answer'>")
+                "<input type='text' class='form-control' data-type='q' placeholder='Enter question'>" +
+                "<input type='text' class='form-control' data-type='a' placeholder='Enter answer'>" +
+                "<input type='text' data-type='a' class='form-control' placeholder='Enter answer'>")
             .appendTo("#divquestions");
         var btnAddAnswer = $('<button/>',
             {
                 type: 'button',
                 text: 'Add answer',
                 click: function () {
-                    console.info("trykket");
+                    //console.info("trykket");
                     var extraanswer = "<input type='text' class='form-control' data-type='a' placeholder='Enter answer'>";
                     $(extraanswer).insertBefore(this);
                 }

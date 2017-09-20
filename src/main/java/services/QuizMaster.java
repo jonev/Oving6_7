@@ -95,7 +95,8 @@ public class QuizMaster {
     public boolean createQuiz(Quiz newQuiz){
         System.out.println(newQuiz.toString());
         if (!activeQuizes.containsKey(newQuiz.getName())) {
-            this.newQuiz = newQuiz;
+            activeQuizes.put(newQuiz.getName(), newQuiz);
+            System.out.println(activeQuizes.keySet());
             return true;
         } else {
             return false;
