@@ -6,11 +6,19 @@ Poenget med systemet er at flere brukere må kunne svare på samme spørsmål sa
 
 Systemet skal ha følgende funksjonalitet:
 
-En side for å registrere nye quiz med spørsmål. En quiz har et navn og et starttidspunkt, mens et spørsmål har en tidsangivelse (i sekunder), en spørsmålstekst, eventuelt en bilde-url (for eksempel fra flickr eller dropbox) , 2 eller flere svaralternativer og hvilket alternativ som er riktig.
-En side som lister opp alle oppkommende og pågående quizzer, med navn og tidspunkt. Brukerne skal kunne "joine" en quiz herfra og samtidig oppgi en "nick". Det skal også gå an å åpne et score-board for hvert quiz fra denne siden.
-En live spørsmålsside som oppdaterer seg automatisk ettersom quizzen fremskrider. Den viser et spørsmål med svaralternativer akkurat så lenge som tidsangivelsen per spørsmål sier. Siden bør en nedtelling som viser hvor mange sekunder du har igjen å svare på.
+En side for å registrere nye quiz med spørsmål. --
+En quiz har et navn og et starttidspunkt, mens et spørsmål har en tidsangivelse (i sekunder),
+en spørsmålstekst, eventuelt en bilde-url (for eksempel fra flickr eller dropbox) ,
+2 eller flere svaralternativer og hvilket alternativ som er riktig.
+En side som lister opp alle oppkommende og pågående quizzer, med navn og tidspunkt.
+Brukerne skal kunne "joine" en quiz herfra og samtidig oppgi en "nick".
+Det skal også gå an å åpne et score-board for hvert quiz fra denne siden.
+En live spørsmålsside som oppdaterer seg automatisk ettersom quizzen fremskrider.
+Den viser et spørsmål med svaralternativer akkurat så lenge som tidsangivelsen per spørsmål sier.
+Siden bør en nedtelling som viser hvor mange sekunder du har igjen å svare på.
 En live scoreboard-side som viser nåværende score for hver deltaker (nick) i et quiz.
-Systemet trenger ingen pålogging eller beskyttelse. Alle kan legge inn nye quiz, og det er kun et nick som trengs for å bli med på et quiz.
+Systemet trenger ingen pålogging eller beskyttelse. Alle kan legge inn nye quiz,
+og det er kun et nick som trengs for å bli med på et quiz.
 
 
 

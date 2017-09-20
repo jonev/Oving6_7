@@ -8,6 +8,7 @@ import java.util.ArrayList;
 public class Question {
     private String question;
     private ArrayList<String> answereAlternatives;
+    private String correctAnswere;
 
     public Question() {
     }
@@ -16,8 +17,13 @@ public class Question {
         return question;
     }
 
+
     public ArrayList<String> getAnswereAlternatives() {
         return answereAlternatives;
+    }
+
+    public void setCorrectAnswere(String correctAnswere) {
+        this.correctAnswere = correctAnswere;
     }
 
     public void setQuestion(String question) {

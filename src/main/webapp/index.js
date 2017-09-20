@@ -9,6 +9,9 @@ $(document).ready(function () {
     numberofquestions = 1;
     activequiz = null;
 
+    function testalert(element) {
+        alert("test");
+    }
 
     if(usernamealocated()){
         $("#divoverview").show();
@@ -38,10 +41,10 @@ $(document).ready(function () {
 
     $('#tablequizes')
         .on('dbl-click-row.bs.table', function (e, row, $element) {
-            // console.log(e);
-            // console.log(row);
-            // console.log($element);
-            fetchQuiz(row);
+            console.log(e);
+            console.log(row);
+            console.log($element);
+            fetchQuiz(row.name);
         });
 
 
@@ -188,23 +191,31 @@ $(document).ready(function () {
     $("#btnaddquestion").on('click', function () {
         $("<label for='question" + numberofquestions + "' class='col-lg-2 control-label'>Question" + numberofquestions + "</label>" +
             "<div id='divquestion" + numberofquestions + "' class='col-lg-10'>" +
-                "<input type='text' class='form-control' data-type='q' placeholder='Enter question'>" +
-                "<input type='text' class='form-control' data-type='a' placeholder='Enter answer'>" +
-                "<input type='text' data-type='a' class='form-control' placeholder='Enter answer'>")
-            .appendTo("#divquestions");
+                "<div class='row'>" +
+                    "<input type='text' class='form-control' ondblclick='testalert(this);' data-type='q' data-cor='false' placeholder='Enter question'>" +
+                "</div>" +
+                "<div class='row'>" +
+                    "<input type='text' class='form-control' data-type='a' data-cor='false' placeholder='Enter answer'>" +
+                "</div>" +
+                "<div class='row'>" +
+                    "<input type='text' class='form-control' data-type='a' data-cor='false' class='form-control' placeholder='Enter answer'>" +
+                "</div>"
+         + "</div>").appendTo("#divquestions");
         var btnAddAnswer = $('<button/>',
             {
                 type: 'button',
                 text: 'Add answer',
                 click: function () {
                     //console.info("trykket");
-                    var extraanswer = "<input type='text' class='form-control' data-type='a' placeholder='Enter answer'>";
+                    var extraanswer = "<div class='row'>" + "<input type='text' data-cor='false' class='form-control' data-type='a' placeholder='Enter answer'>" + "</div>";
                     $(extraanswer).insertBefore(this);
                 }
             });
         $(btnAddAnswer).appendTo("#divquestion" + numberofquestions + "");
         numberofquestions++;
     });
+
+
 
     var intervallupdatescoreboard;
     var intervallupdatequizes;

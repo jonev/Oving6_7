@@ -1,5 +1,6 @@
 package services;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import entities.*;
 
 import javax.ws.rs.*;
@@ -13,7 +14,7 @@ import java.util.*;
 @Path("/Quiz/")
 public class QuizMaster {
     private static ArrayList<User> activeUsers = new ArrayList<User>();
-    private static HashMap<String, QuizInfo> activeQuizes = new HashMap<String, QuizInfo>();
+    private static HashMap<String, Quiz> activeQuizes = new HashMap<String, Quiz>();
     private Quiz newQuiz = null;
 
     public QuizMaster(){
@@ -125,20 +126,14 @@ public class QuizMaster {
     @Path("getquiz/{quizname}")
     @Produces(MediaType.APPLICATION_JSON)
     public Quiz getQuiz(@PathParam("quizname") String quizname) {
-        return (Quiz)activeQuizes.get(quizname);
+        System.out.println(quizname);
+        return activeQuizes.get(quizname);
     }
-
-    // @GET
-    // @Path("getquizes")
-    // @Produces(MediaType.APPLICATION_JSON)
-    // public Collection<String> getQuizes() {
-    //     return activeQuizes.keySet();
-    // }
 
     @GET
     @Path("getquizes")
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<QuizInfo> getQuizes() {
+    public Collection<Quiz> getQuizes() {
         return activeQuizes.values();
     }
 
