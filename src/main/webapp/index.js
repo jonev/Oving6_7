@@ -5,13 +5,16 @@ var numberofquestions;
 var numberofansweres;
 var activequiz;
 var answeringquiz = false;
+
+function testalert(element) {
+    alert("test");
+}
+
+
 $(document).ready(function () {
     numberofquestions = 1;
     activequiz = null;
 
-    function testalert(element) {
-        alert("test");
-    }
 
     if(usernamealocated()){
         $("#divoverview").show();
