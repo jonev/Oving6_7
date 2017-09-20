@@ -1,0 +1,39 @@
+Case 2 - Quiz (vanskeligere)
+
+En annen gründer ønsker å starte opp et nettbasert quiz-system.
+
+Poenget med systemet er at flere brukere må kunne svare på samme spørsmål samtidig. En quiz har derfor et starttidspunkt og en avsatt tid per spørsmål.
+
+Systemet skal ha følgende funksjonalitet:
+
+En side for å registrere nye quiz med spørsmål. En quiz har et navn og et starttidspunkt, mens et spørsmål har en tidsangivelse (i sekunder), en spørsmålstekst, eventuelt en bilde-url (for eksempel fra flickr eller dropbox) , 2 eller flere svaralternativer og hvilket alternativ som er riktig.
+En side som lister opp alle oppkommende og pågående quizzer, med navn og tidspunkt. Brukerne skal kunne "joine" en quiz herfra og samtidig oppgi en "nick". Det skal også gå an å åpne et score-board for hvert quiz fra denne siden.
+En live spørsmålsside som oppdaterer seg automatisk ettersom quizzen fremskrider. Den viser et spørsmål med svaralternativer akkurat så lenge som tidsangivelsen per spørsmål sier. Siden bør en nedtelling som viser hvor mange sekunder du har igjen å svare på.
+En live scoreboard-side som viser nåværende score for hver deltaker (nick) i et quiz.
+Systemet trenger ingen pålogging eller beskyttelse. Alle kan legge inn nye quiz, og det er kun et nick som trengs for å bli med på et quiz.
+
+
+
+Øving 6 - Case Backend
+Lag en backend for valgt case. Dette skal være en REST-server utviklet med JAX-RS.
+
+Tenk "RESTfully". Bruk enkle GET/POST/PUT/DELETE-operasjoner for valgte entiteter (ressurser).
+Test tjenestene ved å bruker browser for GET, og enten CURL eller en nettleserplugin for POST/PUT/DELETE.
+Dere kan bruke en database i bunnen hvis dere vil, men det er greit at alt lagres i statiske variabler på REST-serveren.
+Dere trenger ikke beskytte REST-tjenestene med autentisering.
+Løsningen skal leveres på GitLab eller GitHub og den skal tagges med 'v1.0' når den leveres.
+Løsningen skal bruke maven.
+Jeg må kunne klone prosjektet og kun bruke tomcat:run for å teste at det virker.
+
+
+
+Øving 7 - Case Frontend
+Lag en enkel frontend for casen.
+
+Legg vekt på å få opp skjermbilder og funksjonalitet, ikke tenk så mye på utseende
+Bruk jQuery for AJAX-kall mot REST-serveren dere lagde i forrige øving.
+Bruk Bootstrap eller et annet CSS-rammeverk, men som sagt skal dere gjøre GUI'et enkelt.
+Bruk samme maven- og GitLab/GitHub-prosjekt som i øving 6
+
+
+

@@ -17,6 +17,10 @@ public class QuizMaster {
     private Quiz newQuiz = null;
 
     public QuizMaster(){
+        ArrayList<String> lstAnsweres = new ArrayList<String>();
+        lstAnsweres.add("Ans1");
+        lstAnsweres.add("Ans2");
+
         Quiz q = new Quiz();
         q.setName("Quiz1");
         q.setDescription("Desc quiz 1");
@@ -24,9 +28,31 @@ public class QuizMaster {
         List<Question> lstq = new ArrayList<Question>();
         Question question = new Question();
         question.setQuestion("This is the question1");
+        question.setAnswereAlternatives(lstAnsweres);
         lstq.add(question);
+        lstAnsweres = new ArrayList<String>();
+        lstAnsweres.add("Ans1");
+        lstAnsweres.add("Ans2");
+        lstAnsweres.add("Ans3");
+        lstAnsweres.add("Ans4");
+        lstAnsweres.add("Ans5");
+        lstAnsweres.add("Ans6");
         question = new Question();
         question.setQuestion("This is the question2");
+        question.setAnswereAlternatives(lstAnsweres);
+        lstq.add(question);
+        q.setQuestions(lstq);
+        activeQuizes.put(q.getName(), q);
+        q = new Quiz();
+        q.setName("Quiz2");
+        q.setDescription("Desc quiz 2");
+        q.setStartdate("1513080000");
+        lstq = new ArrayList<Question>();
+        question = new Question();
+        question.setQuestion("This is the question21");
+        lstq.add(question);
+        question = new Question();
+        question.setQuestion("This is the question22");
         lstq.add(question);
         q.setQuestions(lstq);
         activeQuizes.put(q.getName(), q);
@@ -66,7 +92,8 @@ public class QuizMaster {
     public boolean createQuiz(Quiz newQuiz){
         System.out.println(newQuiz.toString());
         if (!activeQuizes.containsKey(newQuiz.getName())) {
-            this.newQuiz = newQuiz;
+            activeQuizes.put(newQuiz.getName(), newQuiz);
+            System.out.println(activeQuizes.keySet());
             return true;
         } else {
             return false;
