@@ -25,5 +25,13 @@ public class User {
         this.score = score;
     }
 
+    public boolean equals(Object o){
+        if(o == null) return false;
+        if(!(o instanceof User)) return false;
+        if(this == o) return true;
+        User in = (User)o;
+        return username.equals(in.username);
+    }
+
 }
 

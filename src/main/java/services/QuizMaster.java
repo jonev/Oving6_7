@@ -1,9 +1,6 @@
 package services;
 
-import entities.Question;
-import entities.Quiz;
-import entities.User;
-import entities.UsersByScore;
+import entities.*;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -16,7 +13,7 @@ import java.util.*;
 @Path("/Quiz/")
 public class QuizMaster {
     private static ArrayList<User> activeUsers = new ArrayList<User>();
-    private static HashMap<String, Quiz> activeQuizes = new HashMap<String, Quiz>();
+    private static HashMap<String, QuizInfo> activeQuizes = new HashMap<String, QuizInfo>();
     private Quiz newQuiz = null;
 
     public QuizMaster(){
@@ -51,11 +48,11 @@ public class QuizMaster {
     @Path("{username}")
     @Produces(MediaType.TEXT_PLAIN)
     public String createUsername(@PathParam("username") String username){
-        if (!activeUsers.contains(username)) { // todo fiks denne. username er ikke en User
-            User newUser = new User();
-            newUser.setUsername(username);
-            newUser.setScore(0);
-           activeUsers.add(newUser);
+        User newUser = new User();
+        newUser.setUsername(username);
+        newUser.setScore(0);
+        if (!activeUsers.contains(newUser)) {
+            activeUsers.add(newUser);
             System.out.println("User added: " + username);
             return username;
         } else {
@@ -101,14 +98,21 @@ public class QuizMaster {
     @Path("getquiz/{quizname}")
     @Produces(MediaType.APPLICATION_JSON)
     public Quiz getQuiz(@PathParam("quizname") String quizname) {
-        return activeQuizes.get(quizname);
+        return (Quiz)activeQuizes.get(quizname);
     }
+
+    // @GET
+    // @Path("getquizes")
+    // @Produces(MediaType.APPLICATION_JSON)
+    // public Collection<String> getQuizes() {
+    //     return activeQuizes.keySet();
+    // }
 
     @GET
     @Path("getquizes")
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<String> getQuizes() {
-        return activeQuizes.keySet();
+    public Collection<QuizInfo> getQuizes() {
+        return activeQuizes.values();
     }
 
 }
