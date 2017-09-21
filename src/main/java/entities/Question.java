@@ -1,5 +1,7 @@
 package entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.ArrayList;
 
 /**
@@ -8,7 +10,7 @@ import java.util.ArrayList;
 public class Question {
     private String question;
     private ArrayList<String> answereAlternatives;
-    private String correctAnswere;
+    private ArrayList<String> correctAnswere;
 
     public Question() {
     }
@@ -22,12 +24,16 @@ public class Question {
         return answereAlternatives;
     }
 
-    public void setCorrectAnswere(String correctAnswere) {
+    public void setCorrectAnswere(ArrayList<String> correctAnswere) {
         this.correctAnswere = correctAnswere;
     }
 
     public void setQuestion(String question) {
         this.question = question;
+    }
+
+    public ArrayList<String> getCorrectAnswere() {
+        return correctAnswere;
     }
 
     public void setAnswereAlternatives(ArrayList<String> answereAlternatives) {

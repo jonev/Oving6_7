@@ -13,12 +13,16 @@ public class Quiz {
     private String description;
     private String startdate;
     private List<Question> questions;
+    private List<User> users;
 
     public Quiz() {
         questions = new ArrayList<Question>();
+        users = new ArrayList<User>();
     }
 
     public Quiz(Quiz light) {
+        questions = new ArrayList<Question>();
+        users = new ArrayList<User>();
         name = light.name;
         description = light.description;
         startdate = light.startdate;
@@ -58,10 +62,21 @@ public class Quiz {
         return questions;
     }
 
+    public List<User> getUsers() {
+        return users;
+    }
 
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
 
     public void setQuestions(List<Question> questions) {
         this.questions = questions;
+    }
+
+    public void addUser(User u){
+        if(users.contains(u)) return;
+        users.add(u);
     }
 
     public String toString(){

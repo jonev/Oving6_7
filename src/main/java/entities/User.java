@@ -9,6 +9,15 @@ public class User {
     public User() {
     }
 
+    public User(User newUser){
+        username = newUser.username;
+        score = 0;
+    }
+    public User(String username){
+        this.username = username;
+        score = 0;
+    }
+
     public String getUsername() {
         return username;
     }

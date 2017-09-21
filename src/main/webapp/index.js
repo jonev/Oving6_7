@@ -6,9 +6,11 @@ var numberofansweres;
 var activequiz;
 var answeringquiz = false;
 var anseringquestion = 0;
+var focuquizname;
+var currentusername;
+
 
 function markAsCorectAnswere(element) {
-    // console.info(element);
     if($(element).attr("data-cor") == "false"){
         $(element).attr("data-cor", "true");
         $(element).css('background-color', 'Aquamarine');
@@ -18,11 +20,10 @@ function markAsCorectAnswere(element) {
     }
 }
 
-
 $(document).ready(function () {
+    // inits
     numberofquestions = 1;
     activequiz = null;
-
 
     if(usernamealocated()){
         $("#divoverview").show();
@@ -36,6 +37,37 @@ $(document).ready(function () {
         });
     });
 
+    $.fn.dataTable.ext.errMode = 'throw';
+    $('#tablequizes').DataTable( {
+        ajax: {
+            url: 'rest/Quiz/getquizes',
+            dataSrc: ''
+        },
+        columns: [
+            { data: 'name' },
+            { data: 'description' },
+            { data: 'startdate' }
+        ]
+    });
+
+    var functablequizscoreboard = $('.tablequizesscoreboard').DataTable( {
+        ajax: {
+            url: 'rest/Quiz/getquizscoreboard/' + focuquizname,
+            dataSrc: ''
+        },
+        columns: [
+            { data: 'username' },
+            { data: 'score' }
+        ]
+    });
+
+
+    // -- init done
+
+    // AJAX
+    function updateScorbardIntervall() {
+        functablequizscoreboard.ajax.url('rest/Quiz/getquizscoreboard/' + focuquizname).load();
+    }
     function fetchScoreboard() {
         $.ajax({
             url: 'rest/Quiz/users',
@@ -48,38 +80,14 @@ $(document).ready(function () {
                 console.info(result.responseText);
             }
         });
-    }
-
-    $('#tablequizes').on('dbl-click-row.bs.table', function (e, row, $element) {
-            console.log(e);
-            console.log(row);
-            console.log($element);
-            fetchQuiz(row.name);
-        });
-
+    };
 
     function fetchQuizes() {
-        $.ajax({
-            url: 'rest/Quiz/getquizes',
-            type: 'GET',
-            datatype: 'json',
-            success: function (data) {
-                // console.info(data);
-                if(data){
-                    $('#tablequizes').bootstrapTable('load', data);
-                }else {
-                    $('#tablequizes').empty();
-                }
-            },
-            error: function (result) {
-                console.info(result.responseText);
-            }
-        });
+        $('#tablequizes').DataTable().ajax.reload();
     }
-
-    function fetchQuiz(quizname) {
+    function fetchQuiz(quizname, username) {
         $.ajax({
-            url: 'rest/Quiz/getquiz/' + quizname,
+            url: 'rest/Quiz/getquiz/' + quizname + "/" + username,
             type: 'GET',
             datatype: 'json',
             success: function (data, result) {
@@ -106,12 +114,85 @@ $(document).ready(function () {
             success: function (data, result) {
                 console.info(result.responseText);
                 console.info(data);
+                addQuestionToHTML(data);
+
             },
             error: function (result) {
                 console.info(result.responseText);
             }
         });
     }
+    function postQuestionAnswers(answers) {
+        $.ajax({
+            url: 'rest/Quiz/questionanswers/' + activequiz.name + "/" + anseringquestion,
+            type: 'POST',
+            data: JSON.stringify(answers),
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function(result) {
+                console.info(result.responseText);
+            },
+            error: function (result) {
+                console.info(result.responseText);
+            }
+        });
+    }
+
+
+
+    var ans;
+    function addQuestionToHTML(data) {
+        ans = new Array(data.answereAlternatives.size);
+        $("<div class='row'><div class='col'><label>" + data.question + "</label></div></div>").appendTo("#divactivequizquestion");
+        $(data.answereAlternatives).each(function (index, obj) {
+            console.info(this);
+            $("<div class='row'><div class='col' id='divactivequizquestionans" + index + "'></div></div>").appendTo("#divactivequizquestion");
+            var btnAddAnswer = $('<button/>',
+                {
+                    type: 'button',
+                    text: this,
+                    class: "btn btn-secondary btn-lg btn-block",
+                    click: function () {
+                        if(ans[index] == 1){
+                            ans[index] = 0;
+                            $(this).removeClass('btn-primary');
+                            $(this).addClass('btn-secondary');
+                        } else {
+                            ans[index] = 1;
+                            $(this).removeClass('btn-secondary');
+                            $(this).addClass('btn-primary');
+                        }
+                        //console.info(this);
+                    }
+                });
+            $(btnAddAnswer).appendTo("#divactivequizquestionans" + index);
+        })
+    }
+
+    $("#testknapp").on('click', function () {
+        fetchQuestion(0);
+    });
+    $("#testknapp2").on('click', function () {
+        postQuestionAnswers(ans);
+    });
+
+    // tables
+    var table = $('#tablequizes').DataTable();
+    $('#tablequizes tbody').on('dblclick', 'tr', function () {
+        var data = table.row( this ).data();
+        console.info(data.name);
+        fetchQuiz(data.name, currentusername);
+    } );
+    $('#tablequizes tbody').on('click', 'tr', function () {
+        var data = table.row( this ).data();
+        focuquizname = data.name;
+        console.info("Single" + data.name);
+        //fetchQuizScoreboard(data.name);
+        intervallupdatequizscoreboard = setInterval(updateScorbardIntervall, 5000);
+        functablequizscoreboard.ajax.url('rest/Quiz/getquizscoreboard/' + focuquizname).load();
+
+    } );
+    // -- tables done
 
     function quizInterval1sek() {
         if(activequiz){
@@ -160,26 +241,14 @@ $(document).ready(function () {
 
 
     $("#btncreateusername").on('click', function () {
-        var u = $("#username").val();
-        if(u == null || u.length < 1) {
-            localStorage.removeItem('username');
+        if($("#username").val() == null || $("#username").val().length < 1) {
             return;
         }
-        $.ajax({
-            url: 'rest/Quiz/' + u,
-            type: 'POST',
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'text',
-            success: function(result) {
-                if(result != null && result != undefined){
-                    $("#divcreateusename").hide();
-                    localStorage["username"] = result;
-                    $("#divoverview").show();
-                }
-            },
-            error: function (result) {
-                console.info(result.responseText);
-            }
+        currentusername = $("#username").val();
+        $("#divcreateusename").hide();
+        $("#divoverview").show(function () {
+            fetchQuizes();
+            intervallupdatequizes = setInterval(fetchQuizes, 5000);
         });
     });
 
@@ -194,7 +263,7 @@ $(document).ready(function () {
             name: name,
             description: desc,
             startdate: "" + moment($('#quizstart').val(), "YYYY-MM-DD HH:mm").valueOf(),
-            questions: []
+            questions: [],
         };
         $.each($("#divquestions"), function (i, l) {
             $('.col-lg-10', l).each(function (j, k) {
@@ -203,11 +272,14 @@ $(document).ready(function () {
                     if(p.getAttribute('data-type') == "q"){
                         jsonQuestion.questions[j] = {"question": $(p).val()};
                         jsonQuestion.questions[j]['answereAlternatives'] = [];
+                        jsonQuestion.questions[j]['correctAnswere'] = [];
                     }
                     if(p.getAttribute('data-type') == "a"){
                         jsonQuestion.questions[j]['answereAlternatives'][anscount] = $(p).val();
                         if(p.getAttribute('data-cor') == "true"){
-                            jsonQuestion.questions[j]['correctAnswere'] = "" + anscount;
+                            jsonQuestion.questions[j]['correctAnswere'][anscount] = "1";
+                        } else {
+                            jsonQuestion.questions[j]['correctAnswere'][anscount] = "0";
                         }
                         anscount++;
                     }
@@ -241,8 +313,10 @@ $(document).ready(function () {
     $("#btnaddquestion").on('click', function () {
         $("<label for='question" + numberofquestions + "' class='col-lg-2 control-label'>Question" + numberofquestions + "</label>" +
             "<div id='divquestion" + numberofquestions + "' data-qnr='" + numberofquestions + "' data-corans='' class='col-lg-10'>" +
+                "<div class='row' id='divquestion" + numberofquestions + "btn'>" +
+                "</div>" +
                 "<div class='row'>" +
-                    "<input type='text' class='form-control' data-type='q' data-cor='false' placeholder='Enter question'>" +
+                    "<input type='text' class='form-control' data-type='q' placeholder='Enter question'>" +
                 "</div>" +
                 "<div class='row'>" +
                     "<input type='text' class='form-control' ondblclick='markAsCorectAnswere(this);' data-type='a' data-cor='false' placeholder='Enter answer'>" +
@@ -255,21 +329,25 @@ $(document).ready(function () {
             {
                 type: 'button',
                 text: 'Add answer',
+                class: '"btn btn-primary"',
                 click: function () {
                     //console.info("trykket");
                     var extraanswer = "<div class='row'>" + "<input type='text' ondblclick='markAsCorectAnswere(this);' data-cor='false' class='form-control' data-type='a' placeholder='Enter answer'>" + "</div>";
-                    $(extraanswer).insertBefore(this);
+                    $($(this).parent().parent()).append(extraanswer);
+                    //console.info($(this).parent().parent());
                 }
             });
-        $(btnAddAnswer).appendTo("#divquestion" + numberofquestions + "");
+        $(btnAddAnswer).appendTo("#divquestion" + numberofquestions + "btn");
         numberofquestions++;
     });
 
 
 
     var intervallupdatescoreboard;
+    var intervallupdatequizscoreboard;
     var intervallupdatequizes;
 
+    // navigation
     $("#navoverview").on("click", function(){
         if(answeringquiz || !usernamealocated()) return;
         $("#divcreateusename").hide();
@@ -317,13 +395,10 @@ $(document).ready(function () {
     });
 
     function usernamealocated() {
-        if(localStorage["username"] == null || localStorage["username"] == undefined || localStorage["username"] == ""){
-            return false;
+        if(currentusername){
+            return true;
         }
-        return true;
+        return false;
     }
-
-
-
 });
 

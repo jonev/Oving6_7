@@ -12,7 +12,7 @@ import java.util.*;
  */
 @Path("/Quiz/")
 public class QuizMaster {
-    private static ArrayList<User> activeUsers = new ArrayList<User>();
+    private static HashMap<String, User> activeUsers = new HashMap<String, User>();
     private static HashMap<String, Quiz> ongoingOrFinishedQuizes = new HashMap<String, Quiz>();
 
     public QuizMaster(){
@@ -75,8 +75,8 @@ public class QuizMaster {
         User newUser = new User();
         newUser.setUsername(username);
         newUser.setScore(0);
-        if (!activeUsers.contains(newUser)) {
-            activeUsers.add(newUser);
+        if (!activeUsers.containsKey(newUser)) {
+            activeUsers.put(username, newUser);
             System.out.println("User added: " + username);
             return username;
         } else {
@@ -91,19 +91,34 @@ public class QuizMaster {
         System.out.println(newQuiz.toString());
         if (!ongoingOrFinishedQuizes.containsKey(newQuiz.getName())) {
             ongoingOrFinishedQuizes.put(newQuiz.getName(), newQuiz);
-            System.out.println(ongoingOrFinishedQuizes.keySet());
+            System.out.println("Created quiz " + newQuiz);
             return true;
         } else {
             return false;
         }
     }
 
+    @POST
+    @Path("questionanswers/{quisname}/{questionnr}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public boolean createQuiz(@PathParam("quisname") String quisname, @PathParam("questionnr") String questionnr, List<String> ans){
+        System.out.println(quisname);
+        System.out.println(questionnr);
+        System.out.println(ans);
+        // calculate score
+
+        // update scoreboard
+
+
+        return true;
+    }
+
     @GET
     @Path("users")
     @Produces(MediaType.APPLICATION_JSON)
     public Collection<User> getUsers() {
-        Collections.sort(activeUsers, new UsersByScore());
-        return activeUsers;
+        //Collections.sort(activeUsers, new UsersByScore());
+        return activeUsers.values();
     }
 
     @GET
@@ -126,11 +141,26 @@ public class QuizMaster {
     }
 
     @GET
-    @Path("getquiz/{quizname}")
+    @Path("getquizscoreboard/{quizname}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Quiz getQuiz(@PathParam("quizname") String quizname) {
+    public Collection<User> getQuizScoreboard(@PathParam("quizname") String quizname) {
+        //System.out.println(quizname);
+        Quiz q = ongoingOrFinishedQuizes.get(quizname);
+        System.out.println(q);
+        Collection<User> us = q.getUsers();
+        //System.out.println(us);
+        return us;
+    }
+
+    @GET
+    @Path("getquiz/{quizname}/{username}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Quiz getQuiz(@PathParam("quizname") String quizname, @PathParam("username") String username) {
         System.out.println(quizname);
-        return new Quiz(ongoingOrFinishedQuizes.get(quizname)); // light
+        System.out.println("adds user to scooreboard" + username);
+        Quiz q = ongoingOrFinishedQuizes.get(quizname);
+        q.addUser(new User(username));
+        return new Quiz(q); // light
     }
 
     @GET
