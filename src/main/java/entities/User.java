@@ -34,6 +34,10 @@ public class User {
         this.score = score;
     }
 
+    public void addScore(int score){
+        this.score += score;
+    }
+
     public boolean equals(Object o){
         if(o == null) return false;
         if(!(o instanceof User)) return false;

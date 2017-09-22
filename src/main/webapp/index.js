@@ -2,12 +2,13 @@
  * @author jonev on 13.09.2017.
  */
 var numberofquestions;
-var numberofansweres;
 var activequiz;
 var answeringquiz = false;
-var anseringquestion = 0;
+var anseringquestion;
 var focuquizname;
 var currentusername;
+var currenttimetoanswere;
+var questionstarttime;
 
 
 function markAsCorectAnswere(element) {
@@ -23,6 +24,9 @@ function markAsCorectAnswere(element) {
 $(document).ready(function () {
     // inits
     numberofquestions = 1;
+    anseringquestion = -1;
+    currenttimetoanswere = 0;
+    questionstarttime = 0;
     activequiz = null;
 
     if(usernamealocated()){
@@ -91,12 +95,17 @@ $(document).ready(function () {
             type: 'GET',
             datatype: 'json',
             success: function (data, result) {
-                console.info(result.responseText);
-                console.info(data);
+                //console.info(result.responseText);
+                //console.info(data);
                 var d = new Date();
                 if(Number(data.startdateAsDate) > d.getTime()) {
                     activequiz = data;
+                    questionstarttime = activequiz.startdateAsDate;
+                    currenttimetoanswere = 0;
+                    anseringquestion = -1;
                     startQuiz();
+                } else {
+                    alert("The quiz has already started...");
                 }
 
             },
@@ -106,25 +115,25 @@ $(document).ready(function () {
         });
     }
 
-    function fetchQuestion(qnr) {
+    function fetchQuestion(quizname, qnr) {
         $.ajax({
-            url: 'rest/Quiz/getnextquestion/' + activequiz.name + "/" + qnr,
+            url: 'rest/Quiz/getnextquestion/' + quizname + "/" + qnr,
             type: 'GET',
             datatype: 'json',
             success: function (data, result) {
-                console.info(result.responseText);
-                console.info(data);
+                // console.info(result.responseText);
+                // console.info(data);
                 addQuestionToHTML(data);
-
+                currenttimetoanswere = parseInt(data.timeToAnswere)*1000;
             },
             error: function (result) {
                 console.info(result.responseText);
             }
         });
     }
-    function postQuestionAnswers(answers) {
+    function postQuestionAnswers(answers, qnr,  username) {
         $.ajax({
-            url: 'rest/Quiz/questionanswers/' + activequiz.name + "/" + anseringquestion,
+            url: 'rest/Quiz/questionanswers/' + activequiz.name + "/" + qnr + "/" + username,
             type: 'POST',
             data: JSON.stringify(answers),
             contentType: 'application/json; charset=utf-8',
@@ -142,10 +151,14 @@ $(document).ready(function () {
 
     var ans;
     function addQuestionToHTML(data) {
-        ans = new Array(data.answereAlternatives.size);
-        $("<div class='row'><div class='col'><label>" + data.question + "</label></div></div>").appendTo("#divactivequizquestion");
+        ans = new Array(data.answereAlternatives.length);
+        for(i = 0; i < ans.length; i++){
+            ans[i] = "0";
+        }
+        $('#divactivequizquestion').empty();
+        $("<div class='row'><div class='col'><h3>" + data.question + "</h3></div></div>").appendTo("#divactivequizquestion");
         $(data.answereAlternatives).each(function (index, obj) {
-            console.info(this);
+            //console.info(this);
             $("<div class='row'><div class='col' id='divactivequizquestionans" + index + "'></div></div>").appendTo("#divactivequizquestion");
             var btnAddAnswer = $('<button/>',
                 {
@@ -169,24 +182,17 @@ $(document).ready(function () {
         })
     }
 
-    $("#testknapp").on('click', function () {
-        fetchQuestion(0);
-    });
-    $("#testknapp2").on('click', function () {
-        postQuestionAnswers(ans);
-    });
-
     // tables
     var table = $('#tablequizes').DataTable();
     $('#tablequizes tbody').on('dblclick', 'tr', function () {
         var data = table.row( this ).data();
-        console.info(data.name);
+        // console.info(data.name);
         fetchQuiz(data.name, currentusername);
     } );
     $('#tablequizes tbody').on('click', 'tr', function () {
         var data = table.row( this ).data();
         focuquizname = data.name;
-        console.info("Single" + data.name);
+        //console.info("Single " + data.name);
         //fetchQuizScoreboard(data.name);
         intervallupdatequizscoreboard = setInterval(updateScorbardIntervall, 5000);
         functablequizscoreboard.ajax.url('rest/Quiz/getquizscoreboard/' + focuquizname).load();
@@ -197,14 +203,28 @@ $(document).ready(function () {
     function quizInterval1sek() {
         if(activequiz){
             // load question
-            // console.info(activequiz);
             var d = new Date();
-            if(Number(activequiz.startdateAsDate) < d.getTime()){
+            var timetoanswere = parseInt(((questionstarttime + currenttimetoanswere) - d.getTime())/1000);
+            $('#activequiztimetoanswere').text(timetoanswere);
+            console.info("Answering q: " + anseringquestion);
+            if(questionstarttime <= d.getTime() && anseringquestion < 0){
                 $('#activequizstart').text("Ongoing");
-            }
-            if(anseringquestion == 0 && Number(activequiz.startdateAsDate)+(anseringquestion*5000) < d.getTime()){
-                fetchQuestion(anseringquestion);
+                console.info("Fetching FIRST question");
                 anseringquestion++;
+                fetchQuestion(activequiz.name, anseringquestion);
+            } else if((questionstarttime + currenttimetoanswere) <= d.getTime() && anseringquestion >= 0){
+                console.info("Posting questionAnswers");
+                postQuestionAnswers(ans, anseringquestion, currentusername);
+                anseringquestion++;
+                if(anseringquestion < activequiz.nrOfQuestions ){
+                    console.info("Fetching new question");
+                    questionstarttime += currenttimetoanswere;
+                   fetchQuestion(activequiz.name, anseringquestion);
+                }else {
+                    console.info("exiting quiz");
+                    $('#divactivequizquestion').empty();
+                    exitQuiz();
+                }
             }
         }
     }
@@ -214,9 +234,6 @@ $(document).ready(function () {
         $("#divcreateusename").hide();
         $("#divoverview").hide(function () {
             window.clearInterval(intervallupdatequizes);
-        });
-        $("#divscoreboard").hide(function () {
-            window.clearInterval(intervallupdatescoreboard);
         });
         $("#divcreatequiz").hide();
         $("#divactivequiz").show(function () {
@@ -229,6 +246,10 @@ $(document).ready(function () {
 
     // exit active quiz
     $("#btnexitquiz").on('click', function () {
+       exitQuiz();
+    });
+
+    function exitQuiz() {
         activequiz = null;
         answeringquiz = false;
         $("#divactivequiz").hide(function () {
@@ -237,7 +258,7 @@ $(document).ready(function () {
         $("#divoverview").show(function () {
             intervallupdatequizes = setInterval(fetchQuizes, 5000);
         });
-    });
+    }
 
 
     $("#btncreateusername").on('click', function () {
@@ -253,35 +274,40 @@ $(document).ready(function () {
     });
 
     $("#btncreatequiz").on('click', function () {
-        var name = $("#quizname").val();
-        var desc = $("#quizdescription").val();
+        var name = $("#quizname").val(); // collecting value from html object
+        var desc = $("#quizdescription").val(); // collecting value from html object
 
+        // if the quiz does not have a name and a description the metod exits
         if(name == undefined || name == null || name.length < 2|| desc == undefined || desc == null || desc.length < 2) {
             return;
         }
-        var jsonQuestion = {
+        // building json object according to my class structure on the server
+        var jsonQuestion = { // be aware of the "{" - this means new object
             name: name,
             description: desc,
             startdate: "" + moment($('#quizstart').val(), "YYYY-MM-DD HH:mm").valueOf(),
-            questions: [],
+            questions: [], // "[]" - means array
         };
         $.each($("#divquestions"), function (i, l) {
             $('.col-lg-10', l).each(function (j, k) {
                 var anscount = 0;
                 $('.form-control', k).each(function (o, p) {
                     if(p.getAttribute('data-type') == "q"){
-                        jsonQuestion.questions[j] = {"question": $(p).val()};
-                        jsonQuestion.questions[j]['answereAlternatives'] = [];
-                        jsonQuestion.questions[j]['correctAnswere'] = [];
+                        jsonQuestion.questions[j] = {"question": $(p).val()}; // be aware of the "{ - }" this means new object - results in object of questions
+                        jsonQuestion.questions[j]['answereAlternatives'] = []; // each question contains a array of answeraltenatives
+                        jsonQuestion.questions[j]['correctAnswere'] = []; // each question contains an array of wich answeres are correct
                     }
-                    if(p.getAttribute('data-type') == "a"){
-                        jsonQuestion.questions[j]['answereAlternatives'][anscount] = $(p).val();
+                    if(p.getAttribute('data-type') == "a"){ // the atribute "data-type" is not default - i made it, add the tag, and its working
+                        jsonQuestion.questions[j]['answereAlternatives'][anscount] = $(p).val(); // collects the aswere alternative
                         if(p.getAttribute('data-cor') == "true"){
                             jsonQuestion.questions[j]['correctAnswere'][anscount] = "1";
                         } else {
                             jsonQuestion.questions[j]['correctAnswere'][anscount] = "0";
                         }
                         anscount++;
+                    }
+                    if(p.getAttribute('data-type') == "t"){ // the atribute "data-type" is not default - i made it, add the tag, and its working
+                        jsonQuestion.questions[j]['timeToAnswere'] = $(p).val();
                     }
                 })
             })
@@ -301,7 +327,6 @@ $(document).ready(function () {
                     $("#divquestions").empty();
                     $("#quizname").val("");
                     $("#quizdescription").val("");
-
                 }
             },
             error: function (result) {
@@ -317,6 +342,9 @@ $(document).ready(function () {
                 "</div>" +
                 "<div class='row'>" +
                     "<input type='text' class='form-control' data-type='q' placeholder='Enter question'>" +
+                "</div>" +
+                "<div class='row'>" +
+                "<input type='text' class='form-control' data-type='t' placeholder='Enter time to answere the question in sec'>" +
                 "</div>" +
                 "<div class='row'>" +
                     "<input type='text' class='form-control' ondblclick='markAsCorectAnswere(this);' data-type='a' data-cor='false' placeholder='Enter answer'>" +
@@ -343,7 +371,6 @@ $(document).ready(function () {
 
 
 
-    var intervallupdatescoreboard;
     var intervallupdatequizscoreboard;
     var intervallupdatequizes;
 
@@ -355,21 +382,6 @@ $(document).ready(function () {
             fetchQuizes();
             intervallupdatequizes = setInterval(fetchQuizes, 5000);
         });
-        $("#divscoreboard").hide(function () {
-            window.clearInterval(intervallupdatescoreboard);
-        });
-        $("#divcreatequiz").hide();
-    });
-    $("#navquizscoreboard").on("click", function(){
-        if(answeringquiz ||!usernamealocated()) return;
-        $("#divcreateusename").hide();
-        $("#divoverview").hide(function () {
-            window.clearInterval(intervallupdatequizes);
-        });
-        $("#divscoreboard").show(function () {
-            intervallupdatescoreboard = setInterval(fetchScoreboard, 5000);
-
-        });
         $("#divcreatequiz").hide();
     });
     $("#navcreatequiz").on("click", function(){
@@ -378,18 +390,12 @@ $(document).ready(function () {
         $("#divoverview").hide(function () {
             window.clearInterval(intervallupdatequizes);
         });
-        $("#divscoreboard").hide(function () {
-            window.clearInterval(intervallupdatescoreboard);
-        });
         $("#divcreatequiz").show();
     });
     $("#navcreateusername").on("click", function(){
         $("#divcreateusename").show();
         $("#divoverview").hide(function () {
             window.clearInterval(intervallupdatequizes);
-        });
-        $("#divscoreboard").hide(function () {
-            window.clearInterval(intervallupdatescoreboard);
         });
         $("#divcreatequiz").hide();
     });

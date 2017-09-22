@@ -88,7 +88,7 @@ public class QuizMaster {
     @Path("createquiz")
     @Consumes(MediaType.APPLICATION_JSON)
     public boolean createQuiz(Quiz newQuiz){
-        System.out.println(newQuiz.toString());
+        //System.out.println(newQuiz.toString());
         if (!ongoingOrFinishedQuizes.containsKey(newQuiz.getName())) {
             ongoingOrFinishedQuizes.put(newQuiz.getName(), newQuiz);
             System.out.println("Created quiz " + newQuiz);
@@ -99,17 +99,30 @@ public class QuizMaster {
     }
 
     @POST
-    @Path("questionanswers/{quisname}/{questionnr}")
+    @Path("questionanswers/{quizname}/{questionnr}/{username}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public boolean createQuiz(@PathParam("quisname") String quisname, @PathParam("questionnr") String questionnr, List<String> ans){
-        System.out.println(quisname);
-        System.out.println(questionnr);
-        System.out.println(ans);
+    public boolean createQuiz(@PathParam("quizname") String quizname, @PathParam("questionnr") String questionnr, @PathParam("username") String username,  List<String> ans){
+        // collect quiz
+        Quiz q = ongoingOrFinishedQuizes.get(quizname);
+        Question qs = q.getQuestions().get(Integer.parseInt(questionnr));
         // calculate score
-
+        int score = 0;
+        for (int i = 0; i < qs.getCorrectAnswere().size(); i++) {
+            String correctanswere = qs.getCorrectAnswere().get(i);
+            //System.out.println(correctanswere);
+            String userstrie = ans.get(i);
+            //System.out.println(userstrie);
+            if((correctanswere.equals("0") && userstrie == null) || userstrie.equals(correctanswere)){
+                score +=1;
+            } else {
+                score -=1;
+            }
+        }
+        // System.out.println("score " + score);
         // update scoreboard
-
-
+        User u = q.getUser(username);
+        u.addScore(score);
+        System.out.println("Users " + username + " Score " + u.getScore());
         return true;
     }
 
@@ -125,16 +138,13 @@ public class QuizMaster {
     @Path("getnextquestion/{quizname}/{questionnr}")
     @Produces(MediaType.APPLICATION_JSON)
     public Question getNextQuestion(@PathParam("quizname") String quizname, @PathParam("questionnr") String questionnr) {
-        System.out.println(quizname);
-        System.out.println(questionnr);
-        int size = 0;
+        System.out.println("getnextquestion quizname " + quizname);
+        System.out.println("getnextquestion qnr " + questionnr);
         Question q = null;
         try{
-            size = ongoingOrFinishedQuizes.get(quizname).getQuestions().size();
             q = ongoingOrFinishedQuizes.get(quizname).getQuestions().get(Integer.parseInt(questionnr));
         } catch (Exception e){
             e.printStackTrace();
-            return null;
         }
         return q;
 
@@ -146,8 +156,9 @@ public class QuizMaster {
     public Collection<User> getQuizScoreboard(@PathParam("quizname") String quizname) {
         //System.out.println(quizname);
         Quiz q = ongoingOrFinishedQuizes.get(quizname);
-        System.out.println(q);
-        Collection<User> us = q.getUsers();
+        // System.out.println(q);
+        Collection<User> us = null;
+        if(q != null) us = q.getUsers();
         //System.out.println(us);
         return us;
     }
@@ -156,10 +167,11 @@ public class QuizMaster {
     @Path("getquiz/{quizname}/{username}")
     @Produces(MediaType.APPLICATION_JSON)
     public Quiz getQuiz(@PathParam("quizname") String quizname, @PathParam("username") String username) {
-        System.out.println(quizname);
-        System.out.println("adds user to scooreboard" + username);
+        System.out.println("Fetched quiz: " + quizname);
+        System.out.println("adds user to scooreboard " + username);
         Quiz q = ongoingOrFinishedQuizes.get(quizname);
         q.addUser(new User(username));
+        System.out.println(username + " added to " + quizname);
         return new Quiz(q); // light
     }
 

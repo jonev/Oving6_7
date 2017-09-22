@@ -14,6 +14,7 @@ public class Quiz {
     private String startdate;
     private List<Question> questions;
     private List<User> users;
+    private int nrOfQuestions;
 
     public Quiz() {
         questions = new ArrayList<Question>();
@@ -21,6 +22,7 @@ public class Quiz {
     }
 
     public Quiz(Quiz light) {
+        nrOfQuestions = light.questions.size();
         questions = new ArrayList<Question>();
         users = new ArrayList<User>();
         name = light.name;
@@ -30,6 +32,10 @@ public class Quiz {
 
     public String getName() {
         return name;
+    }
+
+    public String getNrOfQuestions(){
+        return nrOfQuestions + "";
     }
 
     public String getStartdate() {
@@ -66,12 +72,22 @@ public class Quiz {
         return users;
     }
 
+    public User getUser(String username){
+        for (int i = 0; i < users.size(); i++) {
+            if(users.get(i).getUsername().equals(username)){
+                return users.get(i);
+            }
+        }
+        return null;
+    }
+
     public void setUsers(List<User> users) {
         this.users = users;
     }
 
     public void setQuestions(List<Question> questions) {
         this.questions = questions;
+        this.nrOfQuestions = questions.size();
     }
 
     public void addUser(User u){

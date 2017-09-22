@@ -43,7 +43,6 @@
         <div class="collapse navbar-collapse" id="navbar-collapse">
             <ul class="nav navbar-nav">
                 <li><a class="navbuttons" id="navcreatequiz">Create a quiz</a>
-                <li><a class="navbuttons" id="navquizscoreboard">Scoreboard</a>
                 <!-- <li><a class="navbuttons" id="navcreateusername">Change nick</a> -->
             </ul>
         </div>
@@ -130,40 +129,33 @@
                 </div>
             </form>
         </div>
-        <div id="divscoreboard" hidden>
-            <h1>Scoreboard!</h1>
-            <table data-toggle="table" id="tablescoreboard" class="display table table-bordered">
-                <thead>
-                    <tr>
-                        <th data-field="username">Nick</th><th data-field="score">Score</th>
-                    </tr>
-                </thead>
-            </table>
-        </div>
-        <div id="divactivequiz" hidden>
-            <div class="col-sm-3 col-md-6 col-lg-4">
-                <h1 id="activequizname"></h1>
-                <h3 id="activequizstart"></h3>
-                <section>
-                    <div class="row">
-                        <div class="col-lg-8">
-                            <form action="" class="form-horizontal" id="formactivequiz">
-                                <div class="form-group">
-                                    <div class="col-lg-8 col-lg-offset-2">
-                                        <button id="btnexitquiz" type="button" class="btn btn-primary">Exit</button>
-                                        <button id="testknapp" type="button" ac class="btn btn-primary">Add Q</button>
-                                        <button id="testknapp2" type="button" ac class="btn btn-primary">Add Q</button>
-                                    </div>
-                                </div>
-                                <div id="divactivequizquestion">
+        <div id="divactivequiz" class="container" hidden>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col">
+                        <h1 id="activequizname"></h1>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <h3 id="activequizstart"></h3>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <button id="btnexitquiz" type="button" class="btn btn-primary btn-block">Exit quiz</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <h2 id="activequiztimetoanswere"></h2>
+                    </div>
+                </div>
+                <div id="divactivequizquestion">
 
-                                </div>
-                            </form>
-                        </div>
-                    </div><!-- End the row -->
-                </section>
+                </div>
             </div>
-            <div class="col-sm-9 col-md-6 col-lg-8">
+            <div class="col-md-6">
                 <h2>Scoreboard</h2>
                 <table class="display compact tablequizesscoreboard">
                     <thead>

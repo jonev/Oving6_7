@@ -11,6 +11,7 @@ public class Question {
     private String question;
     private ArrayList<String> answereAlternatives;
     private ArrayList<String> correctAnswere;
+    private String timeToAnswere;
 
     public Question() {
     }
@@ -38,6 +39,14 @@ public class Question {
 
     public void setAnswereAlternatives(ArrayList<String> answereAlternatives) {
         this.answereAlternatives = answereAlternatives;
+    }
+
+    public String getTimeToAnswere() {
+        return timeToAnswere;
+    }
+
+    public void setTimeToAnswere(String timeToAnswere) {
+        this.timeToAnswere = timeToAnswere;
     }
 
     public String toString(){
