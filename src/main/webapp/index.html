@@ -45,6 +45,9 @@
                 <li><a class="navbuttons" id="navcreatequiz">Create a quiz</a>
                 <!-- <li><a class="navbuttons" id="navcreateusername">Change nick</a> -->
             </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a id="navid"></a></li>
+            </ul>
         </div>
     </div><!-- End Container-->
 </nav><!-- End navbar -->
@@ -54,6 +57,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <h2>Quizes</h2>
+                    <p>(Click to see scoreboard, double click to join quiz)</p>
                     <table id="tablequizes" class="display compact">
                         <thead>
                         <tr>
@@ -101,7 +105,7 @@
         <div id="divcreatequiz" class="container" hidden>
             <form action="" id="formcreatequiz" class="col-lg-12">
                 <div class="form-group">
-                    <button id="btncreatequiz" type="button" class="btn btn-primary">Submit</button>
+                    <button id="btncreatequiz" type="button" class="btn btn-primary">Create quiz</button>
                 </div>
                 <div class="form-group">
                     <label for="quizname" >Name</label>

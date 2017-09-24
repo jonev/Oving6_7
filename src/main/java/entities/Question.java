@@ -52,9 +52,12 @@ public class Question {
     public String toString(){
         String s = question;
         if(answereAlternatives == null) return s;
+        int i = 0;
         for (String a: answereAlternatives) {
-            s += ", " + a;
+            s += ", " + a + " correct: " + correctAnswere.get(i);;
+            i++;
         }
+
         return s;
     }
 

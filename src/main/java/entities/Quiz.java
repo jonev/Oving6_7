@@ -1,5 +1,7 @@
 package entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,15 +21,6 @@ public class Quiz {
     public Quiz() {
         questions = new ArrayList<Question>();
         users = new ArrayList<User>();
-    }
-
-    public Quiz(Quiz light) {
-        nrOfQuestions = light.questions.size();
-        questions = new ArrayList<Question>();
-        users = new ArrayList<User>();
-        name = light.name;
-        description = light.description;
-        startdate = light.startdate;
     }
 
     public String getName() {
@@ -64,6 +57,7 @@ public class Quiz {
         this.description = description;
     }
 
+
     public List<Question> getQuestions() {
         return questions;
     }
@@ -96,7 +90,7 @@ public class Quiz {
     }
 
     public String toString(){
-        String s = name + ", " + description + ", " + startdate;
+        String s = "Name: " + name + ", desc: " + description + ", start: " + startdate + " q: ";
         if(questions == null) return s;
         for (Question q : questions) {
             s += q.toString();
