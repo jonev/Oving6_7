@@ -279,7 +279,7 @@ $(document).ready(function () {
         // if the start time i less than 2 minutes untill. It is set to now + 2 minutes
         var qd = moment($('#quizstart').val(), "YYYY-MM-DD HH:mm").valueOf();
         var dn = new Date();
-        if(qd < (dn.getTime()-120000)){
+        if(qd < (dn.getTime()+120000)){
             qd = (dn.getTime()+120000);
         }
 
