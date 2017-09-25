@@ -32,8 +32,11 @@ $(document).ready(function () {
     activequiz = null;
 
     $(function () {
+        moment.locale('en', {
+            week: { dow: 1 } // Monday is the first day of the week
+        });
         $('#divquizstart').datetimepicker({
-            format:"YYYY-MM-DD HH:mm"
+            format:"YYYY-MM-DD HH:mm",
         });
     });
 
@@ -225,11 +228,21 @@ $(document).ready(function () {
 
     // exit active quiz
     $("#btnexitquiz").on('click', function () {
-       exitQuiz();
+        $.ajax({
+            url: 'rest/Quiz/deluser/' + activequiz.name + "/" + currentusername,
+            type: 'POST',
+            success: function (data, result) {
+                exitQuiz();
+            },
+            error: function (result) {
+                console.info(result.responseText);
+            }
+        });
     });
 
     function exitQuiz() {
         activequiz = null;
+        currentusername = null;
         //answeringquiz = false;
         $('#navid').text("");
         $("#divactivequiz").hide(function () {
@@ -260,11 +273,21 @@ $(document).ready(function () {
             alert("Quiz name and description must be more than 2 characters");
             return;
         }
+
+
+        // validate start time for quiz, so the user cant make an quiz that is has already been
+        // if the start time i less than 2 minutes untill. It is set to now + 2 minutes
+        var qd = moment($('#quizstart').val(), "YYYY-MM-DD HH:mm").valueOf();
+        var dn = new Date();
+        if(qd < (dn.getTime()-120000)){
+            qd = (dn.getTime()+120000);
+        }
+
         // building json object according to my class structure on the server
         var jsonQuestion = { // be aware of the "{" - this means new object
             name: name,
             description: desc,
-            startdate: "" + moment($('#quizstart').val(), "YYYY-MM-DD HH:mm").valueOf(),
+            startdate: "" + qd,
             questions: [], // "[]" - means array
         };
         $.each($("#divquestions"), function (i, l) {
@@ -333,8 +356,8 @@ $(document).ready(function () {
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function(data, result, jqXHR) {
-                console.info("Quiz created Success: " + data + ", " + result.responseText);
                 if(data == true){
+                    console.info("Quiz created Success: " + data + ", " + result.responseText);
                     $("#divquestions").empty();
                     $("#quizname").val("");
                     $("#quizdescription").val("");

@@ -89,6 +89,10 @@ public class Quiz {
         users.add(u);
     }
 
+    public void delUser(User u){
+        users.remove(u);
+    }
+
     public String toString(){
         String s = "Name: " + name + ", desc: " + description + ", start: " + startdate + " q: ";
         if(questions == null) return s;

@@ -18,6 +18,14 @@ public class QuizMaster {
     }
 
     @POST
+    @Path("deluser/{quizname}/{username}")
+    public void delUser(@PathParam("quizname") String quizname, @PathParam("username") String username) {
+        Quiz q = ongoingOrFinishedQuizes.get(quizname);
+        User u = new User(username);
+        q.delUser(u);
+    }
+
+    @POST
     @Path("createquiz")
     @Consumes(MediaType.APPLICATION_JSON)
     public boolean createQuiz(Quiz newQuiz){
