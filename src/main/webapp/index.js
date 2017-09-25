@@ -3,7 +3,7 @@
  */
 var numberofquestions;
 var activequiz;
-var answeringquiz = false;
+//var answeringquiz = false;
 var anseringquestion;
 var focuquizname;
 var currentusername;
@@ -216,7 +216,7 @@ $(document).ready(function () {
         });
         $("#divcreatequiz").hide();
         $("#divactivequiz").show(function () {
-            answeringquiz = true;
+            // answeringquiz = true;
             $("#activequizname").text(activequiz.name);
             $("#activequizstart").text(activequiz.startdate);
             intervalFetchUpdateActiveQuiz = setInterval(quizInterval1sek, 1000);
@@ -230,7 +230,8 @@ $(document).ready(function () {
 
     function exitQuiz() {
         activequiz = null;
-        answeringquiz = false;
+        //answeringquiz = false;
+        $('#navid').text("");
         $("#divactivequiz").hide(function () {
             window.clearInterval(intervalFetchUpdateActiveQuiz);
         });
@@ -245,6 +246,7 @@ $(document).ready(function () {
         if(n == null || n.length < 1) {
             alert("Nickname must me more than 1 character")
         }
+        $('#navid').text(n);
         currentusername = n;
         fetchQuiz(focuquizname, currentusername);
     });
@@ -413,9 +415,6 @@ $(document).ready(function () {
 
     var intervallupdatequizscoreboard;
     var intervallupdatequizes;
-
-    // var divoverview = $("#divoverview");
-    // console.info(divoverview);
 
     // navigation
     $("#navoverview").on("click", function(){
