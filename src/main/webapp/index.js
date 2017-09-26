@@ -3,7 +3,6 @@
  */
 var numberofquestions;
 var activequiz;
-//var answeringquiz = false;
 var anseringquestion;
 var focuquizname;
 var currentusername;
@@ -36,7 +35,7 @@ $(document).ready(function () {
             week: { dow: 1 } // Monday is the first day of the week
         });
         $('#divquizstart').datetimepicker({
-            format:"YYYY-MM-DD HH:mm",
+            format:"YYYY-MM-DD HH:mm"
         });
     });
 
@@ -49,10 +48,11 @@ $(document).ready(function () {
         columns: [
             { data: 'name' },
             { data: 'description' },
-            { data: 'startdate' }
-        ]
+            { data: 'startdate' },
+            { data: 'status' }
+        ],
+        order: [[ 3, 'asc' ], [ 2, 'asc' ],  [ 0, 'asc' ]]
     });
-
     var functablequizscoreboard = $('.tablequizesscoreboard').DataTable( {
         ajax: {
             url: 'rest/Quiz/getquizscoreboard/' + focuquizname,
@@ -63,25 +63,24 @@ $(document).ready(function () {
             { data: 'score' }
         ]
     });
-
     // -- init done
 
     // AJAX
-    intervallupdatequizscoreboard = setInterval(updateScorbardIntervall, 5000);
+    // GET
+    function fetchQuizes() {
+        $('#tablequizes').DataTable().ajax.reload();
+    }
     function updateScorbardIntervall() {
         if(focuquizname && focuquizname.length > 0){
             functablequizscoreboard.ajax.url('rest/Quiz/getquizscoreboard/' + focuquizname).load();
         }
-    }
-    function fetchQuizes() {
-        $('#tablequizes').DataTable().ajax.reload();
     }
     function fetchQuiz(quizname, username) {
         $.ajax({
             url: 'rest/Quiz/getquiz/' + quizname + "/" + username,
             type: 'GET',
             datatype: 'json',
-            success: function (data, result) {
+            success: function (data) {
                 if(data == null){
                     alert("Nickname is already taken");
                     return;
@@ -97,15 +96,49 @@ $(document).ready(function () {
             }
         });
     }
-
     function fetchQuestion(quizname, qnr) {
         $.ajax({
             url: 'rest/Quiz/getnextquestion/' + quizname + "/" + qnr,
             type: 'GET',
             datatype: 'json',
-            success: function (data, result) {
+            success: function (data) {
                 addQuestionToHTML(data);
                 currenttimetoanswere = parseInt(data.timeToAnswere)*1000;
+            },
+            error: function (result) {
+                console.info(result.responseText);
+            }
+        });
+    }
+    // POST
+    function createQuiz(jsonQuiz) {
+        $.ajax({
+            url: 'rest/Quiz/createquiz',
+            type: 'POST',
+            data: JSON.stringify(jsonQuiz),
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function(data, result) {
+                if(data == true){
+                    console.info("Quiz created Success: " + data + ", " + result.responseText);
+                    $("#divquestions").empty();
+                    $("#quizname").val("");
+                    $("#quizdescription").val("");
+                } else {
+                    alert("Quiz name already taken");
+                }
+            },
+            error: function (result) {
+                console.info("Error: " + result.responseText);
+            }
+        });
+    }
+    function markQuizAsFinished(quizname) {
+        $.ajax({
+            url: 'rest/Quiz/closequiz/' + quizname,
+            type: 'POST',
+            success: function () {
+                exitQuiz();
             },
             error: function (result) {
                 console.info(result.responseText);
@@ -127,6 +160,24 @@ $(document).ready(function () {
             }
         });
     }
+    function delUser(quizname, username) {
+        $.ajax({
+            url: 'rest/Quiz/deluser/' + quizname + "/" + username,
+            type: 'POST',
+            success: function () {
+                exitQuiz();
+            },
+            error: function (result) {
+                console.info(result.responseText);
+            }
+        });
+    }
+
+    // AJAX done
+
+    // Logic/intervalls
+    var intervallupdatequizscoreboard = setInterval(updateScorbardIntervall, 5000);
+    var intervallupdatequizes = intervallupdatequizes = setInterval(fetchQuizes, 5000);
 
     var ans;
     function addQuestionToHTML(data) {
@@ -136,7 +187,7 @@ $(document).ready(function () {
         }
         $('#divactivequizquestion').empty();
         $("<div class='row'><div class='col'><h3>" + data.question + "</h3></div></div>").appendTo("#divactivequizquestion");
-        $(data.answereAlternatives).each(function (index, obj) {
+        $(data.answereAlternatives).each(function (index) {
             $("<div class='row'><div class='col' id='divactivequizquestionans" + index + "'></div></div>").appendTo("#divactivequizquestion");
             var btnAddAnswer = $('<button/>',
                 {
@@ -179,6 +230,7 @@ $(document).ready(function () {
     $('#tablequizes').on('click', 'tr', function () {
         var data = tablequizes.row( this ).data();
         focuquizname = data.name;
+        $('#pchosenquiz').text("For quiz: " + focuquizname);
         functablequizscoreboard.ajax.url('rest/Quiz/getquizscoreboard/' + focuquizname).load();
     } );
     // -- tables done
@@ -205,7 +257,7 @@ $(document).ready(function () {
                 }else {
                     console.info("Exiting quiz");
                     $('#divactivequizquestion').empty();
-                    exitQuiz();
+                    markQuizAsFinished(activequiz.name);
                 }
             }
         }
@@ -219,7 +271,6 @@ $(document).ready(function () {
         });
         $("#divcreatequiz").hide();
         $("#divactivequiz").show(function () {
-            // answeringquiz = true;
             $("#activequizname").text(activequiz.name);
             $("#activequizstart").text(activequiz.startdate);
             intervalFetchUpdateActiveQuiz = setInterval(quizInterval1sek, 1000);
@@ -228,22 +279,12 @@ $(document).ready(function () {
 
     // exit active quiz
     $("#btnexitquiz").on('click', function () {
-        $.ajax({
-            url: 'rest/Quiz/deluser/' + activequiz.name + "/" + currentusername,
-            type: 'POST',
-            success: function (data, result) {
-                exitQuiz();
-            },
-            error: function (result) {
-                console.info(result.responseText);
-            }
-        });
+        delUser(activequiz.name, currentusername);
     });
 
     function exitQuiz() {
         activequiz = null;
         currentusername = null;
-        //answeringquiz = false;
         $('#navid').text("");
         $("#divactivequiz").hide(function () {
             window.clearInterval(intervalFetchUpdateActiveQuiz);
@@ -284,46 +325,46 @@ $(document).ready(function () {
         }
 
         // building json object according to my class structure on the server
-        var jsonQuestion = { // be aware of the "{" - this means new object
+        var jsonQuizObj = { // be aware of the "{" - this means new object
             name: name,
             description: desc,
             startdate: "" + qd,
-            questions: [], // "[]" - means array
+            questions: [] // "[]" - means array
         };
         $.each($("#divquestions"), function (i, l) {
             $('.col-lg-10', l).each(function (j, k) {
                 var anscount = 0;
                 $('.q', k).each(function (o, p) {
                     if(p.getAttribute('data-type') == "q"){
-                        jsonQuestion.questions[j] = {"question": $(p).val()}; // be aware of the "{ - }" this means new object - results in object of questions
-                        jsonQuestion.questions[j]['answereAlternatives'] = []; // each question contains a array of answeraltenatives
-                        jsonQuestion.questions[j]['correctAnswere'] = []; // each question contains an array of wich answeres are correct
+                        jsonQuizObj.questions[j] = {"question": $(p).val()}; // be aware of the "{ - }" this means new object - results in object of questions
+                        jsonQuizObj.questions[j]['answereAlternatives'] = []; // each question contains a array of answeraltenatives
+                        jsonQuizObj.questions[j]['correctAnswere'] = []; // each question contains an array of wich answeres are correct
                         return;
                     }
                     if(p.getAttribute('data-type') == "a"){ // the atribute "data-type" is not default - i made it, add the tag, and its working
                         if(p.hasAttribute('data-cor') && p.getAttribute('data-cor') == "true"){
-                            jsonQuestion.questions[j]['correctAnswere'][anscount] = "1";
+                            jsonQuizObj.questions[j]['correctAnswere'][anscount] = "1";
                             return;
                         } else if(p.hasAttribute('data-cor') && p.getAttribute('data-cor') == "false") {
-                            jsonQuestion.questions[j]['correctAnswere'][anscount] = "0";
+                            jsonQuizObj.questions[j]['correctAnswere'][anscount] = "0";
                             return;
                         }
-                        jsonQuestion.questions[j]['answereAlternatives'][anscount] = $(p).val(); // collects the aswere alternative
+                        jsonQuizObj.questions[j]['answereAlternatives'][anscount] = $(p).val(); // collects the aswere alternative
                         anscount++;
                     }
                     if(p.getAttribute('data-type') == "t"){ // the atribute "data-type" is not default - i made it, add the tag, and its working
-                        jsonQuestion.questions[j]['timeToAnswere'] = $(p).val();
+                        jsonQuizObj.questions[j]['timeToAnswere'] = $(p).val();
                     }
                 })
             })
         });
         // validation of the quiz
-        if(jsonQuestion.questions.length < 1){
+        if(jsonQuizObj.questions.length < 1){
             alert("A quiz needs minimum one question");
             return;
         }
         var exitfunc = false;
-        $.each(jsonQuestion.questions, function (k, v) {
+        $.each(jsonQuizObj.questions, function (k, v) {
             if(v.question.length < 1){
                 alert("Empty question");
                 exitfunc = true;
@@ -348,27 +389,7 @@ $(document).ready(function () {
         });
 
         if(exitfunc) return;
-
-        $.ajax({
-            url: 'rest/Quiz/createquiz',
-            type: 'POST',
-            data: JSON.stringify(jsonQuestion),
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            success: function(data, result, jqXHR) {
-                if(data == true){
-                    console.info("Quiz created Success: " + data + ", " + result.responseText);
-                    $("#divquestions").empty();
-                    $("#quizname").val("");
-                    $("#quizdescription").val("");
-                } else {
-                    alert("Quiz name already taken");
-                }
-            },
-            error: function (result) {
-                console.info("Error: " + result.responseText);
-            }
-        });
+        createQuiz(jsonQuizObj);
     });
 
     $("#btnaddquestion").on('click', function () {
@@ -400,12 +421,6 @@ $(document).ready(function () {
                         "<button class='btn btn-secondary' type='button' onclick='answerdelete(this)'>X</button>" +
                     "</span>" +
                 "</div>" +
-                //"<div class='row'>" +
-                //    "<input type='text' class='form-control' ondblclick='markAsCorectAnswere(this);' data-type='a' data-cor='false' placeholder='Enter answer'>" +
-                //"</div>" +
-                //"<div class='row'>" +
-                //    "<input type='text' class='form-control' ondblclick='markAsCorectAnswere(this);' data-type='a' data-cor='false' class='form-control' placeholder='Enter answer'>" +
-                //"</div>"
          + "</div>").appendTo("#divquestions");
         var btnAddAnswer = $('<button/>',
             {
@@ -413,10 +428,6 @@ $(document).ready(function () {
                 text: 'Add answer',
                 class: '"btn btn-primary"',
                 click: function () {
-                    //console.info("trykket");
-                    //var extraanswer =   "<div class='row'>" +
-                    //                        "<input type='text' ondblclick='markAsCorectAnswere(this);' data-cor='false' class='form-control' data-type='a' placeholder='Enter answer'>" +
-                    //                    "</div>";
                     var extraanswer = "<div class='input-group'>" +
                         "<span class='input-group-addon'>" +
                         "<input type='checkbox' class='q' data-type='a' onclick='markAsCorectAnswere(this)' data-cor='false'>" +
@@ -427,17 +438,11 @@ $(document).ready(function () {
                         "</span>" +
                         "</div>";
                     $($(this).parent().parent()).append(extraanswer);
-                    //console.info($(this).parent().parent());
                 }
             });
         $(btnAddAnswer).appendTo("#divquestion" + numberofquestions + "btn");
         numberofquestions++;
     });
-
-
-
-    var intervallupdatequizscoreboard;
-    var intervallupdatequizes;
 
     // navigation
     $("#navoverview").on("click", function(){
@@ -448,6 +453,7 @@ $(document).ready(function () {
         $("#divcreateusename").hide();
         $("#divoverview").show(function () {
             fetchQuizes();
+            window.clearInterval(intervallupdatequizes);
             intervallupdatequizes = setInterval(fetchQuizes, 5000);
         });
         $("#divcreatequiz").hide();

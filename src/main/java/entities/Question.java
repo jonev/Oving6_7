@@ -33,7 +33,8 @@ public class Question {
         this.question = question;
     }
 
-    public ArrayList<String> getCorrectAnswere() {
+    // different name from get to avoid sending the correct answers to the client
+    public ArrayList<String> collectCorrectAnswere() {
         return correctAnswere;
     }
 
@@ -54,7 +55,7 @@ public class Question {
         if(answereAlternatives == null) return s;
         int i = 0;
         for (String a: answereAlternatives) {
-            s += ", " + a + " correct: " + correctAnswere.get(i);;
+            s += ", " + a + " correct: " + correctAnswere.get(i);
             i++;
         }
 

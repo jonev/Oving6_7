@@ -2,17 +2,18 @@
 <html lang="en">
 <head>
     <!-- Credit - Wiredwiki -->
+    <!-- Credit - Boostrap documentation -->
+    <!-- Credit - nilstes -->
     <meta charset="utf-8">
     <title>Quiz</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="Quiz masters page">
-    <meta name="author" content="Jova">
+    <meta name="author" content="jonev">
 
     <title>Quiz</title>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.css">
     <link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css">
 
     <!-- Optional theme -->
@@ -64,13 +65,14 @@
                             <th>Name</th>
                             <th>Description</th>
                             <th>Start</th>
+                            <th>Status</th>
                         </tr>
                         </thead>
                     </table>
                 </div>
                 <div class="col-md-6">
                     <h2>Scoreboard</h2>
-                    <p>(For the chosen quiz)</p>
+                    <p id="pchosenquiz">(For the chosen quiz)</p>
                     <table class="display compact tablequizesscoreboard">
                         <thead>
                         <tr>
@@ -182,7 +184,6 @@
     <script src="http://cdn.datatables.net/1.10.9/js/jquery.dataTables.min.js"></script>
     <script src="lib/popper/popper.min.js"></script>
     <script src="lib/bootstrap/js/bootstrap.min.js"></script>
-    <!-- <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.js"></script> -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.js"></script>
     <script src="lib/bootstrap/js/bootstrap-datetimepicker.js"></script>
     <script src="index.js"></script>

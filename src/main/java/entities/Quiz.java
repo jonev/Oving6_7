@@ -17,6 +17,7 @@ public class Quiz {
     private List<Question> questions;
     private List<User> users;
     private int nrOfQuestions;
+    private String status;
 
     public Quiz() {
         questions = new ArrayList<Question>();
@@ -28,6 +29,7 @@ public class Quiz {
     }
 
     public String getNrOfQuestions(){
+        nrOfQuestions = questions.size();
         return nrOfQuestions + "";
     }
 
@@ -57,8 +59,8 @@ public class Quiz {
         this.description = description;
     }
 
-
-    public List<Question> getQuestions() {
+    // different name from get to avoid sending all the questions to the client
+    public List<Question> collectQuestions() {
         return questions;
     }
 
@@ -67,9 +69,9 @@ public class Quiz {
     }
 
     public User getUser(String username){
-        for (int i = 0; i < users.size(); i++) {
-            if(users.get(i).getUsername().equals(username)){
-                return users.get(i);
+        for(User u : users){
+            if(u.getUsername().equals(username)){
+                return u;
             }
         }
         return null;
@@ -82,6 +84,14 @@ public class Quiz {
     public void setQuestions(List<Question> questions) {
         this.questions = questions;
         this.nrOfQuestions = questions.size();
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public void addUser(User u){
