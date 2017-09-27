@@ -8,8 +8,63 @@ var focuquizname;
 var currentusername;
 var currenttimetoanswere;
 var questionstarttime;
+var intervalFetchUpdateActiveQuiz;
+var intervallupdatequizscoreboard;
+var intervallupdatequizes;
 
+/*
+function navOverview() {
+    if($('#divactivequiz').is(":visible")){
+        alert("You have to exit quiz to access the overview");
+        return;
+    }
+    $("#divcreateusename").hide();
+    $("#divoverview").show(function () {
+        fetchQuizes();
+        window.clearInterval(intervallupdatequizes);
+        intervallupdatequizes = setInterval(fetchQuizes, 5000);
+    });
+    $("#divcreatequiz").hide()
+    console.info("Nav to overview");
+}
 
+function navCreateQuiz() {
+    if($('#divactivequiz').is(":visible")){
+        alert("You have to exit quiz to create quiz");
+        return;
+    }
+    $("#divcreateusename").hide();
+    $("#divoverview").hide(function () {
+        window.clearInterval(intervallupdatequizes);
+    });
+    $("#divcreatequiz").show();
+    console.info("Nav to createquiz")
+}
+
+function navCreateUsername() {
+    $("#divcreateusename").show();
+    $("#divoverview").hide(function () {
+        window.clearInterval(intervallupdatequizes);
+    });
+    $("#divcreatequiz").hide();
+    console.info("Nav to create username")
+}
+
+function navActiveQuiz() {
+    $("#divcreateusename").hide();
+    $("#divoverview").hide(function () {
+        window.clearInterval(intervallupdatequizes);
+    });
+    $("#divcreatequiz").hide();
+    $("#divactivequiz").show(function () {
+        $("#activequizname").text(activequiz.name);
+        $("#activequizstart").text(activequiz.startdate);
+        intervalFetchUpdateActiveQuiz = setInterval(quizInterval1sek, 1000);
+    });
+
+    console.info("Nav to create username")
+}
+*/
 function markAsCorectAnswere(element) {
     if($(element).attr("data-cor") == "false"){
         $(element).attr("data-cor", "true");
@@ -29,6 +84,9 @@ $(document).ready(function () {
     currenttimetoanswere = 0;
     questionstarttime = 0;
     activequiz = null;
+    $("#divactivequiz").hide();
+    $("#divcreatequiz").hide();
+    $("#divcreateusename").hide();
 
     $(function () {
         moment.locale('en', {
@@ -263,7 +321,7 @@ $(document).ready(function () {
         }
     }
 
-    var intervalFetchUpdateActiveQuiz;
+
     function startQuiz() {
         $("#divcreateusename").hide();
         $("#divoverview").hide(function () {
@@ -445,6 +503,7 @@ $(document).ready(function () {
     });
 
     // navigation
+
     $("#navoverview").on("click", function(){
         if($('#divactivequiz').is(":visible")){
             alert("You have to exit quiz to access the overview");
@@ -457,6 +516,7 @@ $(document).ready(function () {
             intervallupdatequizes = setInterval(fetchQuizes, 5000);
         });
         $("#divcreatequiz").hide();
+        console.info("Click1");
     });
 
     $("#navcreatequiz").on("click", function(){
@@ -469,6 +529,7 @@ $(document).ready(function () {
             window.clearInterval(intervallupdatequizes);
         });
         $("#divcreatequiz").show();
+        console.info("Click2");
     });
 });
 

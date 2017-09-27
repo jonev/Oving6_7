@@ -13,22 +13,51 @@
     <title>Quiz</title>
 
     <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"> -->
+
+    <!--  <link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css">  -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap4.min.css">
 
     <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"> -->
 
 
 
 </head>
 <style>
-    body{
-        padding-top: 100px;
+    #navoverview:hover{
+        cursor:pointer;
+    }
+    #navcreatequiz:hover{
+        cursor:pointer;
     }
 </style>
 <body>
 <!-- Navbar -->
+<div class="container">
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" >Quizmaster</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link" id="navoverview">Overview</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" id="navcreatequiz">Create quiz</a>
+            </li>
+            <li class="nav-item nav-right">
+                <a class="nav-link disabled" id="navid"></a>
+            </li>
+        </ul>
+    </div>
+</nav>
+</div>
+<!--
 <nav class="navbar navbar-inverse navbar-fixed-top" id="my-navbar">
     <div class="container">
         <div class="navbar-header">
@@ -40,26 +69,25 @@
             </button>
 
             <a id="navoverview" data-page="home" class="navbar-brand" >Overview</a>
-        </div><!-- Navbar Header-->
+        </div
         <div class="collapse navbar-collapse" id="navbar-collapse">
             <ul class="nav navbar-nav">
                 <li><a class="navbuttons" id="navcreatequiz">Create a quiz</a>
-                <!-- <li><a class="navbuttons" id="navcreateusername">Change nick</a> -->
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li><a id="navid"></a></li>
             </ul>
         </div>
-    </div><!-- End Container-->
-</nav><!-- End navbar -->
-
+    </div>
+</nav>
+-->
     <div id="maincontent">
         <div id="divoverview" class="container" >
             <div class="row">
                 <div class="col-md-6">
                     <h2>Quizes</h2>
                     <p>(Click to see scoreboard, double click to join quiz)</p>
-                    <table id="tablequizes" class="display compact">
+                    <table id="tablequizes" class="table table-striped table-bordered" cellspacing="0" width="100%">
                         <thead>
                         <tr>
                             <th>Name</th>
@@ -73,7 +101,7 @@
                 <div class="col-md-6">
                     <h2>Scoreboard</h2>
                     <p id="pchosenquiz">(For the chosen quiz)</p>
-                    <table class="display compact tablequizesscoreboard">
+                    <table class="table table-striped table-bordered tablequizesscoreboard" cellspacing="0" width="100%">
                         <thead>
                         <tr>
                             <th>Name</th>
@@ -85,7 +113,7 @@
             </div>
 
         </div>
-        <div id="divcreateusename" class="container" hidden>
+        <div id="divcreateusename" class="container">
             <div class="row">
                 <div class="col-lg-12">
                     <form class="form-horizontal" id="formcreateusername">
@@ -105,7 +133,7 @@
             </div><!-- End the row -->
 
         </div>
-        <div id="divcreatequiz" class="container" hidden>
+        <div id="divcreatequiz" class="container">
             <form action="" id="formcreatequiz" class="col-lg-12">
                 <div class="form-group">
                     <button id="btncreatequiz" type="button" class="btn btn-primary">Create quiz</button>
@@ -136,56 +164,64 @@
                 </div>
             </form>
         </div>
-        <div id="divactivequiz" class="container" hidden>
-            <div class="col-md-6">
-                <div class="row">
-                    <div class="col">
-                        <h1 id="activequizname"></h1>
+        <div id="divactivequiz" class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col">
+                            <h1 id="activequizname"></h1>
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <h3 id="activequizstart"></h3>
+                    <div class="row">
+                        <div class="col">
+                            <h3 id="activequizstart"></h3>
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <button id="btnexitquiz" type="button" class="btn btn-primary btn-block">Exit quiz</button>
+                    <div class="row">
+                        <div class="col">
+                            <button id="btnexitquiz" type="button" class="btn btn-primary btn-block">Exit quiz</button>
+                        </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <h2 id="activequiztimetoanswere"></h2>
+                    <div class="row">
+                        <div class="col">
+                            <h2 id="activequiztimetoanswere"></h2>
+                        </div>
                     </div>
-                </div>
-                <div id="divactivequizquestion">
+                    <div id="divactivequizquestion">
 
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h2>Scoreboard</h2>
+                    <table class="table table-striped table-bordered tablequizesscoreboard" cellspacing="0" width="100%">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Score</th>
+                        </tr>
+                        </thead>
+                    </table>
                 </div>
             </div>
-            <div class="col-md-6">
-                <h2>Scoreboard</h2>
-                <table class="display compact tablequizesscoreboard">
-                    <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Score</th>
-                    </tr>
-                    </thead>
-                </table>
-            </div>
-
         </div>
 
     </div><!-- End of main content -->
 
     <!-- Bootstrap core JavaScript -->
-
-    <script src="lib/jquery/jquery.min.js"></script>
-    <script src="http://cdn.datatables.net/1.10.9/js/jquery.dataTables.min.js"></script>
-    <script src="lib/popper/popper.min.js"></script>
-    <script src="lib/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="http://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.js"></script>
     <script src="lib/bootstrap/js/bootstrap-datetimepicker.js"></script>
+
+    <!--
+    <script src="lib/jquery/jquery.min.js"></script>
+    <script src="lib/popper/popper.min.js"></script>
+    <script src="lib/bootstrap/js/bootstrap.min.js"></script>
+    -->
     <script src="index.js"></script>
 
 </body>
