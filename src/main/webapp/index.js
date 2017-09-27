@@ -12,59 +12,6 @@ var intervalFetchUpdateActiveQuiz;
 var intervallupdatequizscoreboard;
 var intervallupdatequizes;
 
-/*
-function navOverview() {
-    if($('#divactivequiz').is(":visible")){
-        alert("You have to exit quiz to access the overview");
-        return;
-    }
-    $("#divcreateusename").hide();
-    $("#divoverview").show(function () {
-        fetchQuizes();
-        window.clearInterval(intervallupdatequizes);
-        intervallupdatequizes = setInterval(fetchQuizes, 5000);
-    });
-    $("#divcreatequiz").hide()
-    console.info("Nav to overview");
-}
-
-function navCreateQuiz() {
-    if($('#divactivequiz').is(":visible")){
-        alert("You have to exit quiz to create quiz");
-        return;
-    }
-    $("#divcreateusename").hide();
-    $("#divoverview").hide(function () {
-        window.clearInterval(intervallupdatequizes);
-    });
-    $("#divcreatequiz").show();
-    console.info("Nav to createquiz")
-}
-
-function navCreateUsername() {
-    $("#divcreateusename").show();
-    $("#divoverview").hide(function () {
-        window.clearInterval(intervallupdatequizes);
-    });
-    $("#divcreatequiz").hide();
-    console.info("Nav to create username")
-}
-
-function navActiveQuiz() {
-    $("#divcreateusename").hide();
-    $("#divoverview").hide(function () {
-        window.clearInterval(intervallupdatequizes);
-    });
-    $("#divcreatequiz").hide();
-    $("#divactivequiz").show(function () {
-        $("#activequizname").text(activequiz.name);
-        $("#activequizstart").text(activequiz.startdate);
-        intervalFetchUpdateActiveQuiz = setInterval(quizInterval1sek, 1000);
-    });
-
-    console.info("Nav to create username")
-}
-*/
 function markAsCorectAnswere(element) {
     if($(element).attr("data-cor") == "false"){
         $(element).attr("data-cor", "true");
@@ -88,14 +35,7 @@ $(document).ready(function () {
     $("#divcreatequiz").hide();
     $("#divcreateusename").hide();
 
-    $(function () {
-        moment.locale('en', {
-            week: { dow: 1 } // Monday is the first day of the week
-        });
-        $('#divquizstart').datetimepicker({
-            format:"YYYY-MM-DD HH:mm"
-        });
-    });
+
 
     $.fn.dataTable.ext.errMode = 'throw';
     $('#tablequizes').DataTable( {
@@ -178,7 +118,7 @@ $(document).ready(function () {
             dataType: 'json',
             success: function(data, result) {
                 if(data == true){
-                    console.info("Quiz created Success: " + data + ", " + result.responseText);
+                    addClosableAlert("#divcreatequiz", "The quiz were succesfully made", "alert-success");
                     $("#divquestions").empty();
                     $("#quizname").val("");
                     $("#quizdescription").val("");
@@ -234,8 +174,8 @@ $(document).ready(function () {
     // AJAX done
 
     // Logic/intervalls
-    var intervallupdatequizscoreboard = setInterval(updateScorbardIntervall, 5000);
-    var intervallupdatequizes = intervallupdatequizes = setInterval(fetchQuizes, 5000);
+    intervallupdatequizscoreboard = setInterval(updateScorbardIntervall, 5000);
+    intervallupdatequizes = intervallupdatequizes = setInterval(fetchQuizes, 5000);
 
     var ans;
     function addQuestionToHTML(data) {
@@ -330,7 +270,7 @@ $(document).ready(function () {
         $("#divcreatequiz").hide();
         $("#divactivequiz").show(function () {
             $("#activequizname").text(activequiz.name);
-            $("#activequizstart").text(activequiz.startdate);
+            $("#activequizstart").text("The quiz starts: " + activequiz.startdate);
             intervalFetchUpdateActiveQuiz = setInterval(quizInterval1sek, 1000);
         });
     }
@@ -356,7 +296,7 @@ $(document).ready(function () {
     $("#btncreateusername").on('click', function () {
         var n = $("#username").val();
         if(n == null || n.length < 1) {
-            alert("Nickname must me more than 1 character")
+            addClosableAlert("#divcreateusename", "Nickname must me more than 1 character", "alert-warning");
         }
         $('#navid').text(n);
         currentusername = n;
@@ -369,7 +309,7 @@ $(document).ready(function () {
 
         // if the quiz does not have a name and a description the metod exits
         if(name == undefined || name == null || name.length < 2|| desc == undefined || desc == null || desc.length < 2) {
-            alert("Quiz name and description must be more than 2 characters");
+            addClosableAlert("#divcreatequiz", "Quiz name and description must be more than 2 characters", "alert-warning");
             return;
         }
 
@@ -418,37 +358,48 @@ $(document).ready(function () {
         });
         // validation of the quiz
         if(jsonQuizObj.questions.length < 1){
-            alert("A quiz needs minimum one question");
+            addClosableAlert("#divcreatequiz", "A quiz needs minimum one question", "alert-warning");
             return;
         }
         var exitfunc = false;
         $.each(jsonQuizObj.questions, function (k, v) {
             if(v.question.length < 1){
-                alert("Empty question");
+                addClosableAlert("#divcreatequiz", "Empty question", "alert-warning");
                 exitfunc = true;
                 return;
             }
             if(v.timeToAnswere < 1 || !$.isNumeric(v.timeToAnswere)){
-                alert("Error on time to answer");
+                addClosableAlert("#divcreatequiz", "Error on time to answer", "alert-warning");
                 exitfunc = true;
                 return;
             }
             if(v.answereAlternatives < 1){
-                alert("Aquestion need to have at least one answer");
+                addClosableAlert("#divcreatequiz", "A question need to have at least one answer", "alert-warning");
                 exitfunc = true;
                 return;
             }
             $.each(v.answereAlternatives, function (j, w) {
                 if(w.length < 1){
-                    alert("Empty answer alternative");
+                    addClosableAlert("#divcreatequiz", "Empty answer alternative", "alert-warning");
                     exitfunc = true;
                 }
             })
+            if(exitfunc) return;
         });
 
         if(exitfunc) return;
         createQuiz(jsonQuizObj);
     });
+
+    function addClosableAlert(idAddTo, alerttext, alertclass) {
+        var html =  "<div class='alert " + alertclass + " alert-dismissible fade show' role='alert'>" +
+                        "<button type='button' class='close' data-dismiss='alert' aria-label='Close'>" +
+                            "<span aria-hidden='true'>&times;</span>" +
+                        "</button>" +
+                            alerttext +
+                        "</div>";
+        $(idAddTo).prepend(html);
+    }
 
     $("#btnaddquestion").on('click', function () {
         $("<label for='question" + numberofquestions + "' class='col-lg-2 control-label'>Question" + numberofquestions + "</label>" +
@@ -506,7 +457,7 @@ $(document).ready(function () {
 
     $("#navoverview").on("click", function(){
         if($('#divactivequiz').is(":visible")){
-            alert("You have to exit quiz to access the overview");
+            addClosableAlert("#divactivequiz", "You have to exit quiz to access the overview", "alert-warning");
             return;
         }
         $("#divcreateusename").hide();
@@ -516,12 +467,11 @@ $(document).ready(function () {
             intervallupdatequizes = setInterval(fetchQuizes, 5000);
         });
         $("#divcreatequiz").hide();
-        console.info("Click1");
     });
 
     $("#navcreatequiz").on("click", function(){
         if($('#divactivequiz').is(":visible")){
-            alert("You have to exit quiz to create quiz");
+            addClosableAlert("#divactivequiz", "You have to exit quiz to create quiz", "alert-warning");
             return;
         }
         $("#divcreateusename").hide();
@@ -529,7 +479,6 @@ $(document).ready(function () {
             window.clearInterval(intervallupdatequizes);
         });
         $("#divcreatequiz").show();
-        console.info("Click2");
     });
 });
 
